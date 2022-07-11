@@ -75,6 +75,15 @@ class ItemOrderDetailContainer extends StatelessWidget {
                       SizedBox(
                         height: 15,
                       ),
+                      Text(
+                        cart.notes ?? '',
+                        // "Rp ${currencyFormatter.format(widget.cart.prodPrice)} / biji",
+                        style: primaryTextStyle.copyWith(
+                            fontSize: 10, fontWeight: semiBold),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
                     ],
                   ),
                 ),

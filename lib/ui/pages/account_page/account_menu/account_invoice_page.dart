@@ -15,9 +15,9 @@ class AccountInvoicePage extends StatefulWidget {
 
 class _AccountInvoicePageState extends State<AccountInvoicePage> {
   List<String> categoryStatus = [
-    "Menunggu Pembayaran",
+    // "Menunggu Pembayaran",
     "Pesanan Diproses",
-    "Pesanan Diterima",
+    "Pesanan Dikirim",
     "Pesanan Selesai"
   ];
   int selectedIndex = 0;
@@ -25,7 +25,7 @@ class _AccountInvoicePageState extends State<AccountInvoicePage> {
   void initState() {
     context.read<InvoiceCubit>().fetchInvoice(
           userId: UserSingleton().user.id!,
-          status: selectedIndex + 1,
+          status: selectedIndex + 2,
         );
     super.initState();
   }
@@ -42,7 +42,7 @@ class _AccountInvoicePageState extends State<AccountInvoicePage> {
                 selectedIndex = index;
                 context.read<InvoiceCubit>().fetchInvoice(
                       userId: UserSingleton().user.id!,
-                      status: selectedIndex + 1,
+                      status: selectedIndex + 2,
                     );
               });
             },

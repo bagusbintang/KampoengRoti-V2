@@ -62,7 +62,7 @@ class UserModel extends Equatable {
             ? json['settings_disc_member'].toDouble()
             : null,
         active: json['customer_active'],
-        verified: json['customer_emailverified'],
+        verified: json['customer_verified'],
         defaulAdress: json['default_address'] != null
             ? UserAddressModel.fromJson(json['default_address'])
             : null,

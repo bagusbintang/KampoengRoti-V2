@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:kampoeng_roti2/models/user_model.dart';
 import 'package:kampoeng_roti2/services/services.dart';
 import 'package:mime/mime.dart';
@@ -25,11 +24,18 @@ class AuthService {
     );
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      UserModel user = UserModel.fromJson(data['respons_res']);
-      return user;
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        UserModel user = UserModel.fromJson(data['respons_res']);
+
+        return user;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Login status : ' + mssg);
+      }
     } else {
-      throw Exception('Gagal Login : ' + response.body);
+      throw Exception('Gagal Login :' + response.body);
     }
   }
 
@@ -58,10 +64,16 @@ class AuthService {
     );
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      UserModel user = UserModel.fromJson(data['respons_res']);
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        UserModel user = UserModel.fromJson(data['respons_res']);
 
-      return user;
+        return user;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Register status : ' + mssg);
+      }
     } else {
       throw Exception('Gagal Register :' + response.body);
     }
@@ -88,10 +100,16 @@ class AuthService {
     print(response.body);
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      UserModel user = UserModel.fromJson(data['respons_res']);
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        UserModel user = UserModel.fromJson(data['respons_res']);
 
-      return user;
+        return user;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Ubah Profil status : ' + mssg);
+      }
     } else {
       throw Exception('Gagal Mengubah Profil : ' + response.body);
     }
@@ -140,7 +158,14 @@ class AuthService {
     // var response = await imageUploadRequest.send();
     print(response);
     if (response.statusCode == 200) {
-      return 'Berhasil Mendaftar member !!';
+      // return 'Berhasil Mendaftar member !!';
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        return status;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Meregister Member status : ' + mssg);
+      }
     } else {
       throw Exception('Gagal Meregister Member: ' + response.body);
     }
@@ -164,10 +189,16 @@ class AuthService {
     // print(response.body);
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      UserModel user = UserModel.fromJson(data['respons_res']);
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        UserModel user = UserModel.fromJson(data['respons_res']);
 
-      return user;
+        return user;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal refresh status : ' + mssg);
+      }
     } else {
       throw Exception('Gagal refresh user: ' + response.body);
     }
@@ -191,9 +222,136 @@ class AuthService {
     print(response.body);
 
     if (response.statusCode == 200) {
-      return 'Berhasil !!';
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        return status;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal status : ' + mssg);
+      }
     } else {
       return 'Gagal !!' + response.body;
+    }
+  }
+
+  Future<UserModel> forgotPassword({
+    // String username,
+    required String email,
+  }) async {
+    var body = jsonEncode({
+      'email': email,
+    });
+
+    var response = await http.post(
+      Uri.parse("$forgetPasswordUrl"),
+      headers: headers,
+      body: body,
+    );
+
+    // print(response.body);
+
+    if (response.statusCode == 200) {
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        UserModel user = UserModel.fromJson(data['respons_res']);
+
+        return user;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Forget Password status : ' + mssg);
+      }
+    } else {
+      throw Exception('Gagal Forget Password user: ' + response.body);
+    }
+  }
+
+  Future<void> resendOtp({
+    // String username,
+    required int userId,
+  }) async {
+    var response = await http.post(
+      Uri.parse("$resendOtpUrl/${userId}"),
+      headers: headers,
+    );
+
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Mendapat OTP status : ' + mssg);
+      }
+    } else {
+      throw Exception('Gagal Mendapat OTP user: ' + response.reasonPhrase!);
+    }
+  }
+
+  Future<UserModel> submitOtp({
+    // String username,
+    required int userId,
+    required int otp,
+  }) async {
+    var body = jsonEncode({
+      'otp': otp,
+    });
+
+    var response = await http.post(
+      Uri.parse("$submitOtpUrl/${userId}"),
+      headers: headers,
+      body: body,
+    );
+
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        UserModel user = UserModel.fromJson(data);
+
+        return user;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Mendapat OTP status : ' + mssg);
+      }
+    } else {
+      throw Exception('Gagal Mendapat OTP user: ' + response.body);
+    }
+  }
+
+  Future<UserModel> resetPassword({
+    // String username,
+    required int userId,
+    required String password,
+  }) async {
+    var body = jsonEncode({
+      'newpassword': password,
+    });
+
+    var response = await http.post(
+      Uri.parse("$resetPasswordUrl/${userId}"),
+      headers: headers,
+      body: body,
+    );
+
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        UserModel user = UserModel.fromJson(data);
+
+        return user;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Reset Password status : ' + mssg);
+      }
+    } else {
+      throw Exception('Gagal reser password user: ' + response.body);
     }
   }
 }

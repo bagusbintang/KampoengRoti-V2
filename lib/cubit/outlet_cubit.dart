@@ -9,7 +9,7 @@ class OutletCubit extends Cubit<OutletState> {
   OutletCubit() : super(OutletInitial());
 
   void fetchOutlet({
-    int cityId = 1,
+    int cityId = 0,
     required double latitude,
     required double longitude,
   }) async {

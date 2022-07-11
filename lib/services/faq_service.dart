@@ -11,14 +11,20 @@ class FaqService {
     // print(response.body);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['data']['respons_res'];
-      List<FaqModel> faqs = [];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        List data = jsonDecode(response.body)['data']['respons_res'];
+        List<FaqModel> faqs = [];
 
-      for (var item in data) {
-        faqs.add(FaqModel.fromJson(item));
+        for (var item in data) {
+          faqs.add(FaqModel.fromJson(item));
+        }
+
+        return faqs;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data FAQ : ' + mssg);
       }
-
-      return faqs;
     } else {
       throw Exception('Gagal mendapat kan data FAQ: ' + response.body);
     }

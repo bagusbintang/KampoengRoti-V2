@@ -112,18 +112,25 @@ class _AddressPageState extends State<AddressPage> {
         leading: BackButton(
           color: kBlackColor,
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/main', (route) => false);
           },
         ),
         centerTitle: true,
         backgroundColor: kGreyColor,
         elevation: 0.0,
       ),
-      body: ListView(
-        children: [
-          addressList(),
-          buttonAddAddress(),
-        ],
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
+          return false;
+        },
+        child: ListView(
+          children: [
+            addressList(),
+            buttonAddAddress(),
+          ],
+        ),
       ),
     );
   }

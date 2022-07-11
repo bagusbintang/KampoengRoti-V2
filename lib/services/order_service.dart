@@ -43,9 +43,15 @@ class OrderService {
     // print(response.body);
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
 
-      print(data);
+        print(data);
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data Invoice : ' + mssg);
+      }
     } else {
       throw Exception('Gagal Mengirim data Invoice: ' + response.body);
     }
@@ -64,15 +70,21 @@ class OrderService {
     print(response.body);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['data']['respons_res'];
-      List<InvoiceModel> invoice = [];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        List data = jsonDecode(response.body)['data']['respons_res'];
+        List<InvoiceModel> invoice = [];
 
-      for (var item in data) {
-        // if  (item.containsKey()){}
-        invoice.add(InvoiceModel.fromJson(item));
+        for (var item in data) {
+          // if  (item.containsKey()){}
+          invoice.add(InvoiceModel.fromJson(item));
+        }
+
+        return invoice;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data Invoice : ' + mssg);
       }
-
-      return invoice;
     } else {
       throw Exception('Gagal mendapat kan data Invoice: ' + response.body);
     }

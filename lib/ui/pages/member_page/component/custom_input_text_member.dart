@@ -3,7 +3,7 @@ import 'package:kampoeng_roti2/shared/theme.dart';
 
 class CustomInputTextMember extends StatelessWidget {
   // final String title;
-  final Icon icon;
+  final Padding icon;
   final String hint;
   final TextInputType inputType;
   final TextEditingController? controller;

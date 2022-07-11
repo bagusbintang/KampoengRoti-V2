@@ -19,7 +19,9 @@ class _OutletHeaderPageState extends State<OutletHeaderPage> {
   @override
   void initState() {
     context.read<OutletCubit>().fetchOutlet(
-        latitude: address.latitude ?? 0, longitude: address.longitude ?? 0);
+          latitude: address.latitude ?? 0,
+          longitude: address.longitude ?? 0,
+        );
     super.initState();
   }
 

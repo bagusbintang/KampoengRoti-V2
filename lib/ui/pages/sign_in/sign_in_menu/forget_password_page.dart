@@ -1,6 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kampoeng_roti2/cubit/auth_cubit.dart';
 import 'package:kampoeng_roti2/shared/theme.dart';
+import 'package:kampoeng_roti2/ui/pages/sign_in/sign_in_menu/otp_page.dart';
 import 'package:kampoeng_roti2/ui/widgets/custom_button.dart';
 
 class ForgetPasswordPage extends StatelessWidget {
@@ -8,6 +11,7 @@ class ForgetPasswordPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController emailController = TextEditingController(text: '');
     Widget textFieldEmailOrUsername(String text) {
       return Theme(
         data: ThemeData(
@@ -15,8 +19,8 @@ class ForgetPasswordPage extends StatelessWidget {
         ),
         child: TextFormField(
           textAlign: TextAlign.center,
-          keyboardType: TextInputType.name,
-          // controller: emailController,
+          keyboardType: TextInputType.number,
+          controller: emailController,
           decoration: InputDecoration(
               contentPadding: EdgeInsets.all(25),
               border: OutlineInputBorder(
@@ -93,7 +97,7 @@ class ForgetPasswordPage extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      "Masukkan alamat email atau username untuk mereset password anda",
+                      "Masukkan No telepon yang terdaftar untuk mereset password anda",
                       textAlign: TextAlign.center,
                       style: blackTextStyle.copyWith(
                           fontSize: 14, fontWeight: semiBold),
@@ -103,14 +107,65 @@ class ForgetPasswordPage extends StatelessWidget {
                   SizedBox(
                     height: 30,
                   ),
-                  textFieldEmailOrUsername("Email atau Username"),
+                  textFieldEmailOrUsername("Nomor telepon"),
                   SizedBox(
                     height: 30,
                   ),
-                  CustomButton(
-                      title: 'RESET PASSWORD',
-                      onpress: () {},
-                      color: kPrimaryColor),
+                  BlocConsumer<AuthCubit, AuthState>(
+                    listener: (context, state) {
+                      if (state is AuthForgetPasswordSuccess) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OtpPage(
+                              user: state.user,
+                              email: state.user.email!,
+                              isGuestCheckOut: false,
+                            ),
+                          ),
+                        );
+                      } else if (state is AuthFailed) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: kPrimaryColor,
+                            content: Text(
+                              state.error,
+                              style: blackTextStyle,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    builder: (context, state) {
+                      if (state is AuthLoading) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: kPrimaryColor,
+                          ),
+                        );
+                      }
+                      return CustomButton(
+                          title: 'RESET PASSWORD',
+                          onpress: () {
+                            if (emailController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: kPrimaryColor,
+                                  content: Text(
+                                    'email tidak boleh kosong',
+                                    style: blackTextStyle,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              context
+                                  .read<AuthCubit>()
+                                  .forgetPassword(email: emailController.text);
+                            }
+                          },
+                          color: kPrimaryColor);
+                    },
+                  ),
                 ],
               ),
             ),

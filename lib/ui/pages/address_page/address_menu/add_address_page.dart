@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kampoeng_roti2/cubit/user_address_cubit.dart';
 import 'package:kampoeng_roti2/models/user_address_model.dart';
 import 'package:kampoeng_roti2/shared/theme.dart';
+import 'package:kampoeng_roti2/shared/user_singleton.dart';
 import 'package:kampoeng_roti2/ui/pages/address_page/address_page.dart';
 import 'package:kampoeng_roti2/ui/pages/address_page/component/custom_input_text_address.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
@@ -30,7 +31,7 @@ class _AddAddressState extends State<AddAddressPage> {
 
   UserAddressModel addressModel = UserAddressModel();
   String? _address;
-  bool _checkBoxValue = false;
+  bool _checkBoxValue = true;
   List<Placemark>? _placemarks;
 
   void _getPlace(LatLng latLng) async {
@@ -180,6 +181,11 @@ class _AddAddressState extends State<AddAddressPage> {
     }
 
     Widget buttonDefaultAddress() {
+      if (_checkBoxValue == true) {
+        addressModel.defaultAddress = 1;
+      } else {
+        addressModel.defaultAddress = 0;
+      }
       return Container(
         margin: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
         child: Row(
@@ -218,6 +224,8 @@ class _AddAddressState extends State<AddAddressPage> {
       return BlocConsumer<UserAddressCubit, UserAddressState>(
         listener: (context, state) {
           if (state is UserAddressModelSuccess) {
+            UserSingleton().address = state.userAddressModel;
+            UserSingleton().outlet = state.userAddressModel.outletModel!;
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -251,9 +259,27 @@ class _AddAddressState extends State<AddAddressPage> {
             child: CustomButton(
               title: 'TAMBAH ALAMAT',
               onpress: () {
-                if (tagNameController.toString().isEmpty &&
-                    pinLocationController.toString().isEmpty &&
-                    phoneController.toString().isEmpty) {
+                if (tagNameController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: kPrimaryColor,
+                      content: Text(
+                        "Nama Alamat, Pin Lokasi, Telepon tidak boleh kosong",
+                        style: blackTextStyle,
+                      ),
+                    ),
+                  );
+                } else if (pinLocationController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: kPrimaryColor,
+                      content: Text(
+                        "Nama Alamat, Pin Lokasi, Telepon tidak boleh kosong",
+                        style: blackTextStyle,
+                      ),
+                    ),
+                  );
+                } else if (phoneController.text.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       backgroundColor: kPrimaryColor,

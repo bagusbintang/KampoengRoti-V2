@@ -20,7 +20,12 @@ class AuthCubit extends Cubit<AuthState> {
         email: email,
         password: password,
       );
-      emit(AuthSuccess(user));
+      if (user.verified == 1) {
+        emit(AuthSuccess(user));
+      } else {
+        await AuthService().resendOtp(userId: user.id!);
+        emit(AuthSuccess(user));
+      }
     } catch (e) {
       emit(AuthFailed(e.toString()));
     }
@@ -44,7 +49,7 @@ class AuthCubit extends Cubit<AuthState> {
         lat: lat,
         long: long,
       );
-      emit(AuthSuccess(user));
+      emit(AuthRegisterSuccess(user));
     } catch (e) {
       emit(AuthFailed(e.toString()));
     }
@@ -89,7 +94,7 @@ class AuthCubit extends Cubit<AuthState> {
         noKtp: noKtp,
       );
       UserModel user = await AuthService().refreshUser(userId: userId);
-      emit(AuthSuccess(user));
+      emit(AuthRegisterSuccess(user));
     } catch (e) {
       emit(AuthFailed(e.toString()));
     }
@@ -128,6 +133,75 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       print(e);
       emit(AuthFailed(e.toString()));
+    }
+  }
+
+  void forgetPassword({
+    required String email,
+  }) async {
+    try {
+      emit(AuthLoading());
+      UserModel user = await AuthService().forgotPassword(email: email);
+      emit(AuthForgetPasswordSuccess(user));
+    } catch (e) {
+      emit(
+        AuthFailed(
+          e.toString(),
+        ),
+      );
+    }
+  }
+
+  void resendOtp({
+    required int userId,
+  }) async {
+    try {
+      emit(AuthLoading());
+      await AuthService().resendOtp(userId: userId);
+      emit(AuthResendOtpSuccess('Resend Berhasil !!'));
+    } catch (e) {
+      emit(
+        AuthOtpFailed(
+          e.toString(),
+        ),
+      );
+    }
+  }
+
+  void submitOtp({
+    required int userId,
+    required int otp,
+  }) async {
+    try {
+      emit(AuthLoading());
+      UserModel user = await AuthService().submitOtp(userId: userId, otp: otp);
+      emit(AuthOtpSuccess(user));
+    } catch (e) {
+      emit(
+        AuthOtpFailed(
+          e.toString(),
+        ),
+      );
+    }
+  }
+
+  void resetPassword({
+    required int userId,
+    required String password,
+  }) async {
+    try {
+      emit(AuthLoading());
+      UserModel user = await AuthService().resetPassword(
+        userId: userId,
+        password: password,
+      );
+      emit(AuthResetPasswordSuccess(user));
+    } catch (e) {
+      emit(
+        AuthFailed(
+          e.toString(),
+        ),
+      );
     }
   }
 }

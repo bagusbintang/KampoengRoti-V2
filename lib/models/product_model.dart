@@ -6,6 +6,7 @@ class ProductModel extends Equatable {
   int? status;
   double? price;
   String? imageUrl;
+  int? outletStock;
 
   ProductModel({
     this.id,
@@ -13,6 +14,7 @@ class ProductModel extends Equatable {
     this.status,
     this.price,
     this.imageUrl,
+    this.outletStock,
   });
   @override
   List<Object?> get props => [
@@ -21,6 +23,7 @@ class ProductModel extends Equatable {
         status,
         price,
         imageUrl,
+        outletStock,
       ];
 
   factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
@@ -29,6 +32,7 @@ class ProductModel extends Equatable {
         status: json['plist_status'].toInt(),
         price: json['plist_price'].toDouble(),
         imageUrl: json['prod_url_photo'],
+        outletStock: json['poulet_stock'],
       );
 
   Map<String, dynamic> toJson() {
@@ -38,6 +42,7 @@ class ProductModel extends Equatable {
       'plist_status': status,
       'plist_price': price,
       'prod_url_photo': imageUrl,
+      'poulet_stock': outletStock,
     };
   }
 }

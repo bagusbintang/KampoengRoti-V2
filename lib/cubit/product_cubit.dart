@@ -8,6 +8,25 @@ part 'product_state.dart';
 class ProductCubit extends Cubit<ProductState> {
   ProductCubit() : super(ProductInitial());
 
+  void searchProducts({
+    required int outletId,
+    required String search,
+  }) async {
+    try {
+      emit(ProductLoading());
+      List<ProductModel> products = await ProductService().getSearchProduct(
+        outletId: outletId,
+        search: search,
+      );
+      emit(ProductSearchSuccess(products));
+    } catch (e) {
+      print(e.toString());
+      emit(
+        ProductFailed(e.toString()),
+      );
+    }
+  }
+
   void fetchProducts({
     required int catId,
     required int outletId,

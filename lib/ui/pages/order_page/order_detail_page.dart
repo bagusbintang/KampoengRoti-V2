@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -5,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:kampoeng_roti2/cubit/cart_cubit.dart';
 import 'package:kampoeng_roti2/cubit/order_cubit.dart';
 import 'package:kampoeng_roti2/models/cart_model.dart';
+import 'package:kampoeng_roti2/models/outlet_model.dart';
 import 'package:kampoeng_roti2/shared/promo_singleton.dart';
 import 'package:kampoeng_roti2/shared/theme.dart';
 import 'package:kampoeng_roti2/shared/user_singleton.dart';
@@ -19,6 +22,7 @@ import 'package:kampoeng_roti2/ui/pages/order_page/order_page_menu/item_order_de
 import 'package:kampoeng_roti2/ui/pages/promo_page/promo_detail_page.dart';
 import 'package:kampoeng_roti2/ui/pages/promo_page/promo_page.dart';
 import 'package:kampoeng_roti2/ui/widgets/custom_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OrderDetailPage extends StatefulWidget {
   const OrderDetailPage({Key? key}) : super(key: key);
@@ -86,6 +90,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    UserSingleton().isDeliveryOption = isDeliveryChoosen;
+
     Widget header() {
       return Container(
         child: Column(
@@ -181,6 +187,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   setState(() {
                     isDeliveryChoosen = true;
                     isPickUpChoosen = false;
+                    UserSingleton().isDeliveryOption = true;
                   });
                 },
                 backgroundColor:
@@ -198,6 +205,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   setState(() {
                     isDeliveryChoosen = false;
                     isPickUpChoosen = true;
+
+                    UserSingleton().isDeliveryOption = false;
                   });
                 },
                 backgroundColor: isPickUpChoosen ? kPrimaryColor : kWhiteColor,
@@ -293,9 +302,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           if (isDeliveryChoosen) {
             options = 'Pengiriman';
           }
+          OutletModel outlet = UserSingleton().outlet;
 
-          String distance =
-              "( ${UserSingleton().outlet.distance!.round()} KM )";
+          String distance = "( ${outlet.distance!.round()} KM )";
 
           return Container(
             margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
@@ -321,7 +330,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     onPress: () {
                       DatePicker.showDatePicker(context,
                           showTitleActions: true,
-                          minTime: DateTime.now(),
+                          minTime: selectDate,
                           maxTime: DateTime(selectDate.year, 12, 31),
                           theme: DatePickerTheme(
                             headerColor: kPrimaryColor,
@@ -358,7 +367,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           doneStyle: blackTextStyle.copyWith(fontSize: 16),
                         ),
                         pickerModel: CustomPicker(
-                          currentTime: DateTime.now(),
+                          currentTime: selectDate,
                           locale: LocaleType.id,
                         ),
                         onChanged: (date) {
@@ -842,6 +851,27 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     }
 
     Widget button({required double? totalPrice}) {
+      void launchWhatsApp({
+        required int phone,
+        required String message,
+      }) async {
+        String url() {
+          if (Platform.isAndroid) {
+            // add the [https]
+            return "https://wa.me/$phone/?text=${Uri.parse(message)}"; // new line
+          } else {
+            // add the [https]
+            return "https://api.whatsapp.com/send?phone=$phone=${Uri.parse(message)}"; // new line
+          }
+        }
+
+        if (await canLaunch(url())) {
+          await launch(url());
+        } else {
+          throw 'Could not launch ${url()}';
+        }
+      }
+
       return BlocConsumer<OrderCubit, OrderState>(
         listener: (context, state) {
           if (state is OrderSuccess) {
@@ -858,6 +888,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     RouteSettings(arguments: [selectDate, isDeliveryChoosen]),
               ),
             );
+
+            launchWhatsApp(
+                phone: int.parse(UserSingleton().contactUs.whatsapp!),
+                message: 'HELLO');
           } else if (state is OrderFailed) {
             print(state.error);
             ScaffoldMessenger.of(context).showSnackBar(

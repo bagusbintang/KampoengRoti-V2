@@ -17,20 +17,18 @@ class CustomProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return CustomPopUpDialog(
-              product: product,
-            );
-          },
-        );
+        if (product.outletStock! > 0) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CustomPopUpDialog(
+                product: product,
+              );
+            },
+          );
+        }
       },
       child: Container(
-        // height: 200,
-        // width: 150,
-        // margin: EdgeInsets.symmetric(
-        //     vertical: 5.0, horizontal: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
@@ -48,69 +46,120 @@ class CustomProductCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          children: <Widget>[
-            Stack(
-              children: [
-                SizedBox(
-                  height: 150,
-                  width: double.infinity,
-                  child: ClipRRect(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(10.0)),
-                    child: Image.network(
-                      product.imageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (BuildContext context, Object exception,
-                          StackTrace? stackTrace) {
-                        return Text('Image not Found !');
-                      },
+        child: Stack(
+          children: [
+            Column(
+              children: <Widget>[
+                Stack(
+                  children: [
+                    SizedBox(
+                      height: 150,
+                      width: double.infinity,
+                      child: ClipRRect(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(10.0)),
+                        child: Image.network(
+                          product.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (BuildContext context, Object exception,
+                              StackTrace? stackTrace) {
+                            print(exception);
+                            return SizedBox(
+                              height: 150,
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: Text(
+                                  'Image not found!',
+                                  style: blackTextStyle.copyWith(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                  ),
+                    prodFav(),
+                  ],
                 ),
-                if (product.status == 1)
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Image.asset(
-                      "assets/vec_love.png",
-                      height: 25,
-                      width: 25,
-                    ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  product.title!,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Text(
+                  // "Rp. ${product.price}",
+                  NumberFormat.currency(
+                    locale: 'id',
+                    symbol: 'Rp ',
+                    decimalDigits: 0,
+                  ).format(product.price),
+                  style: chocolateTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: medium,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Spacer(),
               ],
             ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              product.title!,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            Text(
-              // "Rp. ${product.price}",
-              NumberFormat.currency(
-                locale: 'id',
-                symbol: 'Rp ',
-                decimalDigits: 0,
-              ).format(product.price),
-              style: chocolateTextStyle.copyWith(
-                fontSize: 12,
-                fontWeight: medium,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            Spacer(),
+            prodStock(),
           ],
         ),
       ),
     );
+  }
+
+  Widget prodFav() {
+    if (product.status == 1) {
+      return Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Image.asset(
+          "assets/vec_love.png",
+          height: 25,
+          width: 25,
+        ),
+      );
+    } else {
+      return SizedBox();
+    }
+  }
+
+  Widget prodStock() {
+    if (product.outletStock! > 0) {
+      return SizedBox();
+    } else {
+      return Stack(
+        children: [
+          Container(
+            // height: 150,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: kGreyColor.withOpacity(0.6),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
+            ),
+          ),
+          SizedBox(
+            // height: 150,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                'Out of Stock',
+                style: darkGreyTextStyle.copyWith(fontWeight: medium),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
   }
 }

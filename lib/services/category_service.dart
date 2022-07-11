@@ -17,14 +17,20 @@ class CategoryService {
     // print(response.body);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['data']['respons_res'];
-      List<CategoryModel> categories = [];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        List data = jsonDecode(response.body)['data']['respons_res'];
+        List<CategoryModel> categories = [];
 
-      for (var item in data) {
-        categories.add(CategoryModel.fromJson(item));
+        for (var item in data) {
+          categories.add(CategoryModel.fromJson(item));
+        }
+
+        return categories;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data Category : ' + mssg);
       }
-
-      return categories;
     } else {
       throw Exception('Gagal mendapat kan data Category: ' + response.body);
     }

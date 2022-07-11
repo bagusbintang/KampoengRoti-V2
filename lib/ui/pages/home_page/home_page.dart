@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:kampoeng_roti2/cubit/banner_cubit.dart';
 import 'package:kampoeng_roti2/cubit/cart_cubit.dart';
@@ -15,6 +14,7 @@ import 'package:kampoeng_roti2/shared/theme.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kampoeng_roti2/shared/user_singleton.dart';
+import 'package:kampoeng_roti2/ui/pages/account_page/account_menu/account_invoice_page.dart';
 import 'package:kampoeng_roti2/ui/pages/address_page/address_page.dart';
 import 'package:kampoeng_roti2/ui/pages/order_page/order_notif_page.dart';
 import 'package:kampoeng_roti2/ui/pages/outlets_page/outlet_header_page.dart';
@@ -104,44 +104,53 @@ class _HomePageState extends State<HomePage> {
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 30,
-                      height: 30,
-                      margin: EdgeInsets.only(right: 3),
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: Image.asset(
-                              'assets/icon_notif.png',
-                              width: 24,
-                              height: 24,
-                            ),
-                          ),
-                          Positioned(
-                            top: -2,
-                            right: 0,
-                            child: Container(
-                              padding: EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.black,
-                                ),
-                                shape: BoxShape.circle,
-                                // borderRadius: BorderRadius.all(
-                                //   Radius.circular(20),
-                                // ),
-                                color: kPrimaryColor,
-                              ),
-                              child: Text(
-                                '0',
-                                style: whiteTextStyle.copyWith(
-                                  fontSize: 8,
-                                  fontWeight: light,
-                                ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AccountInvoicePage(),
+                            ));
+                      },
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        margin: EdgeInsets.only(right: 3),
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: Image.asset(
+                                'assets/icon_notif.png',
+                                width: 24,
+                                height: 24,
                               ),
                             ),
-                          ),
-                        ],
+                            Positioned(
+                              top: -2,
+                              right: 0,
+                              child: Container(
+                                padding: EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black,
+                                  ),
+                                  shape: BoxShape.circle,
+                                  // borderRadius: BorderRadius.all(
+                                  //   Radius.circular(20),
+                                  // ),
+                                  color: kPrimaryColor,
+                                ),
+                                child: Text(
+                                  '0',
+                                  style: whiteTextStyle.copyWith(
+                                    fontSize: 8,
+                                    fontWeight: light,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     InkWell(
@@ -309,7 +318,7 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(8.0),
                               child: Image.network(
                                 state.banners[index].imageUrl!,
-                                // height: 200.0,
+                                height: 200.0,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
                                 errorBuilder: (BuildContext context,
@@ -323,16 +332,16 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                          state.banners.length, (index) => buildDot(index)),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   height: 15,
+                  // ),
+                  // Container(
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.center,
+                  //     children: List.generate(
+                  //         state.banners.length, (index) => buildDot(index)),
+                  //   ),
+                  // ),
                 ],
               );
             }
@@ -348,7 +357,7 @@ class _HomePageState extends State<HomePage> {
 
     Widget icon() {
       return Container(
-        margin: EdgeInsets.only(top: 30),
+        margin: EdgeInsets.only(top: 24),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -529,7 +538,7 @@ class _HomePageState extends State<HomePage> {
         return Column(
           children: [
             Container(
-              margin: EdgeInsets.only(top: 20),
+              // margin: EdgeInsets.only(top: 20),
               child: Row(
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -566,32 +575,30 @@ class _HomePageState extends State<HomePage> {
               },
               builder: (context, state) {
                 if (state is ProductSuccess) {
-                  return ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: double.infinity),
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      scrollDirection: Axis.vertical,
-                      physics: NeverScrollableScrollPhysics(),
-                      childAspectRatio: 4 / 6,
-                      children: state.products.map((ProductModel newProducts) {
-                        return CustomNewProductCard(
-                          product: newProducts,
-                          onPress: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return CustomPopUpDialog(
-                                  product: newProducts,
-                                );
-                              },
-                            );
-                          },
-                        );
-                      }).toList(),
-                    ),
+                  return GridView.count(
+                    padding: EdgeInsets.zero,
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    scrollDirection: Axis.vertical,
+                    physics: NeverScrollableScrollPhysics(),
+                    childAspectRatio: 4 / 6,
+                    children: state.products.map((ProductModel newProducts) {
+                      return CustomNewProductCard(
+                        product: newProducts,
+                        onPress: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return CustomPopUpDialog(
+                                product: newProducts,
+                              );
+                            },
+                          );
+                        },
+                      );
+                    }).toList(),
                   );
                 }
                 return Center(

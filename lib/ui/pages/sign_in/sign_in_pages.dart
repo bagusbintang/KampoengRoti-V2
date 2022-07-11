@@ -4,7 +4,10 @@ import 'package:kampoeng_roti2/cubit/auth_cubit.dart';
 import 'package:kampoeng_roti2/shared/shared_pref.dart';
 import 'package:kampoeng_roti2/shared/theme.dart';
 import 'package:kampoeng_roti2/shared/user_singleton.dart';
+import 'package:kampoeng_roti2/ui/pages/address_page/address_menu/add_address_page.dart';
+import 'package:kampoeng_roti2/ui/pages/address_page/address_menu/edit_address_page.dart';
 import 'package:kampoeng_roti2/ui/pages/sign_in/sign_in_menu/forget_password_page.dart';
+import 'package:kampoeng_roti2/ui/pages/sign_up/sign_up_menu/sign_up_otp_page.dart';
 import 'package:kampoeng_roti2/ui/widgets/custom_button.dart';
 
 class SignInPage extends StatefulWidget {
@@ -84,10 +87,13 @@ class _SignInPageState extends State<SignInPage> {
               contentPadding: EdgeInsets.all(25),
               filled: true,
               fillColor: kGreyColor,
-              hintText: 'username/email',
-              prefixIcon: Icon(
-                Icons.person,
-                color: kDarkGreyColor,
+              hintText: 'email/no telp',
+              prefixIcon: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: ImageIcon(
+                  AssetImage('assets/user.png'),
+                  color: kDarkGreyColor,
+                ),
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(defaultRadius),
@@ -122,9 +128,12 @@ class _SignInPageState extends State<SignInPage> {
               filled: true,
               fillColor: kGreyColor,
               hintText: 'password',
-              prefixIcon: Icon(
-                Icons.lock,
-                color: kDarkGreyColor,
+              prefixIcon: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: ImageIcon(
+                  AssetImage('assets/padlock.png'),
+                  color: kDarkGreyColor,
+                ),
               ),
               suffixIcon: IconButton(
                 focusColor: kDarkGreyColor,
@@ -152,7 +161,7 @@ class _SignInPageState extends State<SignInPage> {
     }
 
     Widget rememberAndForgetPassword() {
-      bool _checkBoxValue = false;
+      bool _checkBoxValue = true;
       void _checkBoxOnChange() {}
 
       return Padding(
@@ -180,11 +189,7 @@ class _SignInPageState extends State<SignInPage> {
                       // ),
                       value: _checkBoxValue,
                       activeColor: Colors.grey[600],
-                      onChanged: (bool? newValue) {
-                        setState(() {
-                          _checkBoxValue = newValue!;
-                        });
-                      },
+                      onChanged: null,
                       // controlAffinity: ListTileControlAffinity
                       //     .leading, //  <-- leading Checkbox
                     ),
@@ -232,15 +237,44 @@ class _SignInPageState extends State<SignInPage> {
       return BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
-            MySharedPreferences.instance.setLoginValue("login", true);
-            MySharedPreferences.instance
-                .setIntegerValue("userId", state.user.id);
-            UserSingleton().user = state.user;
-            UserSingleton().address = state.user.defaulAdress!;
-            UserSingleton().outlet = state.user.defaulAdress!.outletModel!;
+            if (state.user.verified == 1) {
+              MySharedPreferences.instance.setLoginValue("login", true);
+              MySharedPreferences.instance
+                  .setIntegerValue("userId", state.user.id);
+              UserSingleton().user = state.user;
+              UserSingleton().address = state.user.defaulAdress!;
+              UserSingleton().outlet = state.user.defaulAdress!.outletModel!;
 
-            Navigator.pushNamedAndRemoveUntil(
-                context, '/main', (route) => false);
+              if (UserSingleton().address.tagAddress == 'Default') {
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => EditAddressPage(),
+                //     settings: RouteSettings(arguments: UserSingleton().address),
+                //   ),
+                // );
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddAddressPage(),
+                      settings: RouteSettings(arguments: state.user.id),
+                    ));
+              } else {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/main', (route) => false);
+              }
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SignUpOtpPage(
+                    user: state.user,
+                    email: state.user.email!,
+                    isGuestCheckOut: false,
+                  ),
+                ),
+              );
+            }
           } else if (state is AuthFailed) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -293,7 +327,7 @@ class _SignInPageState extends State<SignInPage> {
                 ),
               ),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/sign-up');
+                Navigator.pushNamed(context, '/sign-up');
               },
             ),
           ],

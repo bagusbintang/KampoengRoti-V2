@@ -22,17 +22,23 @@ class OutletService {
       headers: headers,
     );
 
-    // print(response.body);
+    print(response.body);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['data']['respons_res'];
-      List<OutletModel> outlets = [];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        List data = jsonDecode(response.body)['data']['respons_res'];
+        List<OutletModel> outlets = [];
 
-      for (var item in data) {
-        outlets.add(OutletModel.fromJson(item));
+        for (var item in data) {
+          outlets.add(OutletModel.fromJson(item));
+        }
+
+        return outlets;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data Outlet : ' + mssg);
       }
-
-      return outlets;
     } else {
       throw Exception('Gagal mendapat kan data Outlet: ' + response.body);
     }

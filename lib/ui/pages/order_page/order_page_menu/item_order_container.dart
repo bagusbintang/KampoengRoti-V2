@@ -92,6 +92,15 @@ class _ItemOrderContainerState extends State<ItemOrderContainer> {
                       SizedBox(
                         height: 15,
                       ),
+                      Text(
+                        widget.cart.notes ?? '',
+                        // "Rp ${currencyFormatter.format(widget.cart.prodPrice)} / biji",
+                        style: primaryTextStyle.copyWith(
+                            fontSize: 10, fontWeight: semiBold),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

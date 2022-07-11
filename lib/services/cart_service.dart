@@ -16,16 +16,22 @@ class CartService {
     // print(response.body);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['data']['respons_res'];
-      List<CartModel> cartList = [];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        List data = jsonDecode(response.body)['data']['respons_res'];
+        List<CartModel> cartList = [];
 
-      for (var item in data) {
-        cartList.add(CartModel.fromJson(item));
+        for (var item in data) {
+          cartList.add(CartModel.fromJson(item));
+        }
+
+        return cartList;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data Cart : ' + mssg);
       }
-
-      return cartList;
     } else {
-      throw Exception('Gagal mendapat kan data Cart!');
+      throw Exception('Gagal mendapat kan data Cart!' + response.body);
     }
   }
 
@@ -47,10 +53,16 @@ class CartService {
     print(response.body);
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      CartModel cartModel = CartModel.fromJson(data['respons_res']);
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        CartModel cartModel = CartModel.fromJson(data['respons_res']);
 
-      return cartModel;
+        return cartModel;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data Cart : ' + mssg);
+      }
     } else {
       throw Exception('Gagal Menambah Cart');
     }
@@ -77,10 +89,16 @@ class CartService {
     print(response.body);
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      CartModel cartModel = CartModel.fromJson(data['respons_res']);
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        CartModel cartModel = CartModel.fromJson(data['respons_res']);
 
-      return cartModel;
+        return cartModel;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Mengubah Cart : ' + mssg);
+      }
     } else {
       throw Exception('Gagal Mengubah Cart');
     }
@@ -103,6 +121,12 @@ class CartService {
 
       // return cartModel;
       // return "Berhasil Menghapus";
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Mengubah Cart : ' + mssg);
+      }
     } else {
       throw Exception('Gagal Menghapus Cart');
     }

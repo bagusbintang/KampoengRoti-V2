@@ -16,14 +16,20 @@ class UserAddressService {
     print(response.body);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['data']['respons_res'];
-      List<UserAddressModel> userAddress = [];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        List data = jsonDecode(response.body)['data']['respons_res'];
+        List<UserAddressModel> userAddress = [];
 
-      for (var item in data) {
-        userAddress.add(UserAddressModel.fromJson(item));
+        for (var item in data) {
+          userAddress.add(UserAddressModel.fromJson(item));
+        }
+
+        return userAddress;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data Address : ' + mssg);
       }
-
-      return userAddress;
     } else {
       throw Exception('Gagal mendapat kan data Address: ' + response.body);
     }
@@ -64,10 +70,16 @@ class UserAddressService {
     );
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      UserAddressModel user = UserAddressModel.fromJson(data['respons_res']);
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        UserAddressModel user = UserAddressModel.fromJson(data['respons_res']);
 
-      return user;
+        return user;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Menambah data Address : ' + mssg);
+      }
     } else {
       throw Exception('Gagal Menambah Address: ' + response.body);
     }
@@ -109,10 +121,16 @@ class UserAddressService {
     print(response.body);
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      UserAddressModel user = UserAddressModel.fromJson(data['respons_res']);
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        var data = jsonDecode(response.body)['data'];
+        UserAddressModel user = UserAddressModel.fromJson(data['respons_res']);
 
-      return user;
+        return user;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal Menambah data Address : ' + mssg);
+      }
     } else {
       throw Exception('Gagal Mengubah Address: ' + response.body);
     }

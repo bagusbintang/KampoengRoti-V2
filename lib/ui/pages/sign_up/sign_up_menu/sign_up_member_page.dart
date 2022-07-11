@@ -4,6 +4,7 @@ import 'package:kampoeng_roti2/cubit/auth_cubit.dart';
 import 'package:kampoeng_roti2/models/user_model.dart';
 import 'package:kampoeng_roti2/shared/theme.dart';
 import 'package:kampoeng_roti2/ui/pages/member_page/member_menu/member_menu_sign_up.dart';
+import 'package:kampoeng_roti2/ui/pages/sign_in/sign_in_menu/otp_page.dart';
 import 'package:kampoeng_roti2/ui/widgets/custom_button.dart';
 
 class SignUpMemberPage extends StatefulWidget {

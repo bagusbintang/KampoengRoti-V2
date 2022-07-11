@@ -30,7 +30,17 @@ class CustomPopUpDialog extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (BuildContext context, Object exception,
                     StackTrace? stackTrace) {
-                  return Text('Image not Found !');
+                  // print(exception);
+                  return SizedBox(
+                    height: 150,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        'Image not found!',
+                        style: blackTextStyle.copyWith(),
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
@@ -38,14 +48,15 @@ class CustomPopUpDialog extends StatelessWidget {
             //   "assets/images/banner_promo.png",
             //   fit: BoxFit.scaleDown,
             // ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Image.asset(
-                "assets/vec_love.png",
-                height: 25,
-                width: 25,
+            if (product.status == 1)
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Image.asset(
+                  "assets/vec_love.png",
+                  height: 25,
+                  width: 25,
+                ),
               ),
-            ),
           ],
         ),
       );

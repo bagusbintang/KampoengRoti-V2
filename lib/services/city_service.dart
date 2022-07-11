@@ -14,14 +14,20 @@ class CityService {
     // print(response.body);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['data']['respons_res'];
-      List<CityModel> city = [];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        List data = jsonDecode(response.body)['data']['respons_res'];
+        List<CityModel> city = [];
 
-      for (var item in data) {
-        city.add(CityModel.fromJson(item));
+        for (var item in data) {
+          city.add(CityModel.fromJson(item));
+        }
+
+        return city;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data City : ' + mssg);
       }
-
-      return city;
     } else {
       throw Exception('Gagal mendapat kan data City: ' + response.body);
     }

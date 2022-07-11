@@ -20,6 +20,15 @@ class ProductSuccess extends ProductState {
   List<Object> get props => [products];
 }
 
+class ProductSearchSuccess extends ProductState {
+  final List<ProductModel> products;
+
+  ProductSearchSuccess(this.products);
+  @override
+  // TODO: implement props
+  List<Object> get props => [products];
+}
+
 class ProductFailed extends ProductState {
   final String error;
   ProductFailed(this.error);

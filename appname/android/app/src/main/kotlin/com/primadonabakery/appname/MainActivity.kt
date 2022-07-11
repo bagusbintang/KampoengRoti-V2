@@ -1,4 +1,4 @@
-package com.bagusbintang.kampoeng_roti
+package com.primadonabakery.appname
 
 import io.flutter.embedding.android.FlutterActivity
 

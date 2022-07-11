@@ -127,28 +127,29 @@ class AccountShareAppPage extends StatelessWidget {
                 errorCorrectionLevel: QrErrorCorrectLevel.M,
                 padding: EdgeInsets.all(20),
                 size: 250,
-                data: "http://kampoengroti.com/home",
+                data:
+                    "https://play.google.com/store/apps/details?id=com.bagusbintang.kampoeng_roti",
               ),
               SizedBox(
                 height: 15,
               ),
-              Text(
-                "Bagi Aplikasi Lewat Lainnya",
-                textAlign: TextAlign.center,
-                style: blackTextStyle.copyWith(fontWeight: semiBold),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              AccountMiniButton(
-                text: "Whatsapp",
-                onPress: () {
-                  launchWhatsApp(phone: 628983898855, message: 'Hello');
-                },
-              ),
-              SizedBox(
-                height: 30,
-              ),
+              // Text(
+              //   "Bagi Aplikasi Lewat Lainnya",
+              //   textAlign: TextAlign.center,
+              //   style: blackTextStyle.copyWith(fontWeight: semiBold),
+              // ),
+              // SizedBox(
+              //   height: 15,
+              // ),
+              // AccountMiniButton(
+              //   text: "Whatsapp",
+              //   onPress: () {
+              //     launchWhatsApp(phone: 628983898855, message: 'Hello');
+              //   },
+              // ),
+              // SizedBox(
+              //   height: 30,
+              // ),
             ],
           ),
         ),

@@ -15,16 +15,22 @@ class BannerService {
     // print(response.body);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['data']['respons_res'];
-      List<BannerModel> banners = [];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        List data = jsonDecode(response.body)['data']['respons_res'];
+        List<BannerModel> banners = [];
 
-      for (var item in data) {
-        banners.add(BannerModel.fromJson(item));
+        for (var item in data) {
+          banners.add(BannerModel.fromJson(item));
+        }
+
+        return banners;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data Banner : ' + mssg);
       }
-
-      return banners;
     } else {
-      throw Exception('Gagal mendapat kan data Category: ' + response.body);
+      throw Exception('Gagal mendapat kan data Banner: ' + response.body);
     }
   }
 }

@@ -270,11 +270,29 @@ class _EditAddressPageState extends State<EditAddressPage> {
               horizontal: defaultMargin,
             ),
             child: CustomButton(
-              title: 'TAMBAH ALAMAT',
+              title: 'SIMPAN',
               onpress: () {
-                if (tagNameController.toString().isEmpty &&
-                    pinLocationController.toString().isEmpty &&
-                    phoneController.toString().isEmpty) {
+                if (tagNameController!.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: kPrimaryColor,
+                      content: Text(
+                        "Nama Alamat, Pin Lokasi, Telepon tidak boleh kosong",
+                        style: blackTextStyle,
+                      ),
+                    ),
+                  );
+                } else if (pinLocationController!.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: kPrimaryColor,
+                      content: Text(
+                        "Nama Alamat, Pin Lokasi, Telepon tidak boleh kosong",
+                        style: blackTextStyle,
+                      ),
+                    ),
+                  );
+                } else if (phoneController!.text.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       backgroundColor: kPrimaryColor,
@@ -311,7 +329,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Tambah Alamat",
+          "Ubah Alamat",
           style: blackTextStyle.copyWith(
             fontSize: 18,
             fontWeight: bold,

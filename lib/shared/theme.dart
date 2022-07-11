@@ -11,6 +11,7 @@ Color kGreyColor = Color(0xffebebeb);
 Color kBlackColor = Color(0xff242424);
 Color kDarkGreyColor = Color(0xff929292);
 Color kRedColor = Color(0xffc13021);
+Color kRedColorWithOpacity = Color(0xffc13021).withOpacity(0.5);
 Color kYellowColor = Color(0xffe8c56b);
 Color kOrangeColor = Color(0xffe88037);
 Color kTransparentColor = Colors.transparent;
@@ -49,6 +50,10 @@ TextStyle orangeTextStyle = GoogleFonts.poppins(
 
 TextStyle primaryTextStyle = GoogleFonts.poppins(
   color: kPrimaryColor,
+);
+
+TextStyle redOpacityTextStyle = GoogleFonts.poppins(
+  color: kRedColorWithOpacity,
 );
 
 FontWeight light = FontWeight.w300;

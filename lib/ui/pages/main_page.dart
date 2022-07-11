@@ -19,6 +19,27 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DateTime? currentBackPressTime;
+
+    Future<bool> onWillPop() {
+      DateTime now = DateTime.now();
+      if (currentBackPressTime == null ||
+          now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+        currentBackPressTime = now;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: kPrimaryColor,
+            content: Text(
+              'Tekan sekali lagi untuk keluar..',
+              style: blackTextStyle,
+            ),
+          ),
+        );
+        return Future.value(false);
+      }
+      return Future.value(true);
+    }
+
     Widget buildContain(int currentIndex) {
       switch (currentIndex) {
         case 0:
@@ -85,26 +106,30 @@ class MainPage extends StatelessWidget {
 
     return BlocBuilder<PageCubit, int>(
       builder: (context, currengIndex) {
-        return Scaffold(
-          body: Stack(
-            children: [
-              Container(
-                // margin: EdgeInsets.all(defaultMargin),
-                width: double.infinity,
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: AssetImage(
-                      'assets/kr_background.png',
+        return WillPopScope(
+          onWillPop: onWillPop,
+          child: Scaffold(
+            body: Stack(
+              children: [
+                Container(
+                  // margin: EdgeInsets.all(defaultMargin),
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(40)),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: AssetImage(
+                        'assets/kr_background.png',
+                      ),
                     ),
                   ),
                 ),
-              ),
-              buildContain(currengIndex),
-              customBottomNavigation(),
-            ],
+                buildContain(currengIndex),
+                customBottomNavigation(),
+              ],
+            ),
           ),
         );
       },

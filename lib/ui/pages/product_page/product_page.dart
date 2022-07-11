@@ -12,6 +12,7 @@ import 'package:kampoeng_roti2/models/user_model.dart';
 import 'package:kampoeng_roti2/shared/category_singleton.dart';
 import 'package:kampoeng_roti2/shared/theme.dart';
 import 'package:kampoeng_roti2/shared/user_singleton.dart';
+import 'package:kampoeng_roti2/ui/pages/account_page/account_menu/account_invoice_page.dart';
 import 'package:kampoeng_roti2/ui/pages/address_page/address_page.dart';
 import 'package:kampoeng_roti2/ui/pages/order_page/order_notif_page.dart';
 import 'package:kampoeng_roti2/ui/pages/outlets_page/outlet_header_page.dart';
@@ -45,7 +46,6 @@ class _ProductPageState extends State<ProductPage> {
     context.read<ProductCubit>().fetchProducts(
           catId: catSingleton.id,
           outletId: UserSingleton().outlet.id ?? 1,
-          search: search,
         );
     super.initState();
   }
@@ -99,70 +99,30 @@ class _ProductPageState extends State<ProductPage> {
                   ),
                 ),
               ),
-              Container(
-                margin: EdgeInsets.only(
-                  top: 30,
-                  right: defaultMargin,
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 30,
-                      height: 30,
-                      margin: EdgeInsets.only(right: 3),
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: Image.asset(
-                              'assets/icon_notif.png',
-                              width: 24,
-                              height: 24,
-                            ),
-                          ),
-                          Positioned(
-                            top: -2,
-                            right: 0,
-                            child: Container(
-                              padding: EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.black,
-                                ),
-                                shape: BoxShape.circle,
-                                // borderRadius: BorderRadius.all(
-                                //   Radius.circular(20),
-                                // ),
-                                color: kPrimaryColor,
-                              ),
-                              child: Text(
-                                '0',
-                                style: whiteTextStyle.copyWith(
-                                  fontSize: 8,
-                                  fontWeight: light,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OrderNotifPage(),
-                          ),
-                        );
-                      },
-                      child: Container(
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AccountInvoicePage(),
+                      ));
+                },
+                child: Container(
+                  margin: EdgeInsets.only(
+                    top: 30,
+                    right: defaultMargin,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
                         width: 30,
                         height: 30,
+                        margin: EdgeInsets.only(right: 3),
                         child: Stack(
                           children: [
                             Center(
                               child: Image.asset(
-                                'assets/icon_cart.png',
+                                'assets/icon_notif.png',
                                 width: 24,
                                 height: 24,
                               ),
@@ -170,39 +130,88 @@ class _ProductPageState extends State<ProductPage> {
                             Positioned(
                               top: -2,
                               right: 0,
-                              child: BlocBuilder<CartCubit, CartState>(
-                                builder: (context, state) {
-                                  if (state is CartSuccess) {
-                                    return Container(
-                                      padding: EdgeInsets.all(4),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.black,
-                                        ),
-                                        shape: BoxShape.circle,
-                                        // borderRadius: BorderRadius.all(
-                                        //   Radius.circular(20),
-                                        // ),
-                                        color: kPrimaryColor,
-                                      ),
-                                      child: Text(
-                                        state.carts.length.toString(),
-                                        style: whiteTextStyle.copyWith(
-                                          fontSize: 8,
-                                          fontWeight: light,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  return SizedBox();
-                                },
+                              child: Container(
+                                padding: EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black,
+                                  ),
+                                  shape: BoxShape.circle,
+                                  // borderRadius: BorderRadius.all(
+                                  //   Radius.circular(20),
+                                  // ),
+                                  color: kPrimaryColor,
+                                ),
+                                child: Text(
+                                  '0',
+                                  style: whiteTextStyle.copyWith(
+                                    fontSize: 8,
+                                    fontWeight: light,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OrderNotifPage(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: Image.asset(
+                                  'assets/icon_cart.png',
+                                  width: 24,
+                                  height: 24,
+                                ),
+                              ),
+                              Positioned(
+                                top: -2,
+                                right: 0,
+                                child: BlocBuilder<CartCubit, CartState>(
+                                  builder: (context, state) {
+                                    if (state is CartSuccess) {
+                                      return Container(
+                                        padding: EdgeInsets.all(4),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.black,
+                                          ),
+                                          shape: BoxShape.circle,
+                                          // borderRadius: BorderRadius.all(
+                                          //   Radius.circular(20),
+                                          // ),
+                                          color: kPrimaryColor,
+                                        ),
+                                        child: Text(
+                                          state.carts.length.toString(),
+                                          style: whiteTextStyle.copyWith(
+                                            fontSize: 8,
+                                            fontWeight: light,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return SizedBox();
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -262,52 +271,65 @@ class _ProductPageState extends State<ProductPage> {
         Widget searchInput() {
           return Container(
             margin: EdgeInsets.only(top: 30),
-            child: TextFormField(
-              textAlign: TextAlign.center,
-              cursorColor: kDarkGreyColor,
-              controller: searchController,
-              obscureText: false,
-              onChanged: (value) {
-                if (value != null && value != '') {
-                  if (value.length >= 3) {
-                    // context.read<ProductCubit>().fetchProducts(
-                    //     catId: catSingleton.id,
-                    //     outletId: UserSingleton().outlet.id!,
-                    //     search: value);
-                    setState(() {
-                      search = value;
-                    });
-                  }
-                }
-
-                // context.read<ProductCubit>().fetchProducts(
-                //       catSingleton.id,
-                //       catSingleton.outletId,
-                //       search,
-                //     );
-
-                // value != "" ? search = value : search = "all";
-              },
-              decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(25),
-                  filled: true,
-                  fillColor: kGreyColor,
-                  hintText: 'Cari Product Kampoeng Roti',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(defaultRadius),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    textAlign: TextAlign.center,
+                    cursorColor: kDarkGreyColor,
+                    controller: searchController,
+                    obscureText: false,
+                    onChanged: (value) {
+                      if (value != null && value != '') {
+                        if (value.length >= 3) {
+                          // context.read<ProductCubit>().fetchProducts(
+                          //     catId: catSingleton.id,
+                          //     outletId: UserSingleton().outlet.id!,
+                          //     search: value);
+                          setState(() {
+                            search = value;
+                            catSingleton.title = 'Search';
+                            context.read<ProductCubit>().searchProducts(
+                                  outletId: UserSingleton().outlet.id!,
+                                  search: value,
+                                );
+                          });
+                        }
+                      }
+                    },
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(18),
+                        filled: true,
+                        fillColor: kGreyColor,
+                        hintText: 'Cari Product Kampoeng Roti',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(defaultRadius),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(defaultRadius),
+                          borderSide: BorderSide(
+                            color: kGreyColor,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(defaultRadius),
+                          borderSide: BorderSide(
+                            color: kGreyColor,
+                          ),
+                        )),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(defaultRadius),
-                    borderSide: BorderSide(
-                      color: kGreyColor,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(defaultRadius),
-                    borderSide: BorderSide(
-                      color: kGreyColor,
-                    ),
-                  )),
+                ),
+                IconButton(
+                  onPressed: () {
+                    // catSingleton.title = 'Search';
+                    context.read<ProductCubit>().searchProducts(
+                          outletId: UserSingleton().outlet.id!,
+                          search: search,
+                        );
+                  },
+                  icon: Icon(Icons.search),
+                ),
+              ],
             ),
           );
         }
@@ -380,7 +402,7 @@ class _ProductPageState extends State<ProductPage> {
                               }).toList(),
                             ),
                           ),
-                          // searchInput(),
+                          searchInput(),
                         ],
                       ),
                     );
@@ -439,6 +461,26 @@ class _ProductPageState extends State<ProductPage> {
               },
               builder: (context, state) {
                 if (state is ProductSuccess) {
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: double.infinity),
+                    child: GridView.count(
+                      padding: EdgeInsets.zero,
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      scrollDirection: Axis.vertical,
+                      physics: NeverScrollableScrollPhysics(),
+                      childAspectRatio: .7,
+                      children: state.products.map((ProductModel product) {
+                        return CustomProductCard(
+                          product: product,
+                          onPress: () {},
+                        );
+                      }).toList(),
+                    ),
+                  );
+                } else if (state is ProductSearchSuccess) {
                   if (state.products.length == 0) {
                     return Container(
                       padding: EdgeInsets.symmetric(
@@ -460,6 +502,7 @@ class _ProductPageState extends State<ProductPage> {
                     return ConstrainedBox(
                       constraints: BoxConstraints(maxHeight: double.infinity),
                       child: GridView.count(
+                        padding: EdgeInsets.zero,
                         crossAxisCount: 2,
                         shrinkWrap: true,
                         crossAxisSpacing: 10,

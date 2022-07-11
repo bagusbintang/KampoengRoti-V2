@@ -15,14 +15,20 @@ class ProvinceService {
     // print(response.body);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['data']['respons_res'];
-      List<ProvinceModel> provinces = [];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        List data = jsonDecode(response.body)['data']['respons_res'];
+        List<ProvinceModel> provinces = [];
 
-      for (var item in data) {
-        provinces.add(ProvinceModel.fromJson(item));
+        for (var item in data) {
+          provinces.add(ProvinceModel.fromJson(item));
+        }
+
+        return provinces;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data Province : ' + mssg);
       }
-
-      return provinces;
     } else {
       throw Exception('Gagal mendapat kan data Province: ' + response.body);
     }

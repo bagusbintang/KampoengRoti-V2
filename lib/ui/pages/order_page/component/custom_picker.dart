@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:kampoeng_roti2/shared/user_singleton.dart';
 
 class CustomPicker extends CommonPickerModel {
   String digits(int value, int length) {
@@ -21,7 +22,14 @@ class CustomPicker extends CommonPickerModel {
 
   @override
   String? leftStringAtIndex(int index) {
-    if (index >= 0 && index < 24) {
+    int? delivStartTime = UserSingleton().outlet.delivStart;
+    int? delivEndTime = UserSingleton().outlet.delivEnd;
+    int? pickUpStartTime = UserSingleton().outlet.pickUpStart;
+    int? pickUpEndTime = UserSingleton().outlet.pickUpEnd;
+    bool isDeliv = UserSingleton().isDeliveryOption;
+    int startTime = isDeliv ? delivStartTime! : pickUpStartTime!;
+    int endTime = isDeliv ? delivEndTime! : pickUpEndTime!;
+    if (index >= startTime && index <= endTime) {
       return this.digits(index, 2);
     } else {
       return null;

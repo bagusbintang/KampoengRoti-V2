@@ -160,7 +160,13 @@ class _MemberMenuSignUpState extends State<MemberMenuSignUp> {
         return Container(
           margin: EdgeInsets.symmetric(vertical: 10),
           child: CustomInputTextMember(
-            icon: Icon(Icons.person),
+            icon: Padding(
+              padding: EdgeInsets.all(12.0),
+              child: ImageIcon(
+                AssetImage('assets/name.png'),
+                color: kDarkGreyColor,
+              ),
+            ),
             hint: 'Nama Lengkap',
             inputType: TextInputType.name,
             controller: nameController,
@@ -173,7 +179,13 @@ class _MemberMenuSignUpState extends State<MemberMenuSignUp> {
         return Container(
           margin: EdgeInsets.symmetric(vertical: 10),
           child: CustomInputTextMember(
-            icon: Icon(Icons.mail),
+            icon: Padding(
+              padding: EdgeInsets.all(12.0),
+              child: ImageIcon(
+                AssetImage('assets/address.png'),
+                color: kDarkGreyColor,
+              ),
+            ),
             hint: 'Alamat',
             inputType: TextInputType.name,
             controller: addressController,
@@ -214,7 +226,13 @@ class _MemberMenuSignUpState extends State<MemberMenuSignUp> {
               }
             },
             child: CustomInputTextMember(
-              icon: Icon(Icons.phone_in_talk_sharp),
+              icon: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: ImageIcon(
+                  AssetImage('assets/tanggallahir.png'),
+                  color: kDarkGreyColor,
+                ),
+              ),
               hint: 'Tanggal Lahir',
               inputType: TextInputType.name,
               enable: false,
@@ -228,7 +246,13 @@ class _MemberMenuSignUpState extends State<MemberMenuSignUp> {
         return Container(
           margin: EdgeInsets.symmetric(vertical: 10),
           child: CustomInputTextMember(
-            icon: Icon(Icons.phone_in_talk_sharp),
+            icon: Padding(
+              padding: EdgeInsets.all(12.0),
+              child: ImageIcon(
+                AssetImage('assets/name.png'),
+                color: kDarkGreyColor,
+              ),
+            ),
             hint: 'Nomor Identitas (KTP/SIM)',
             inputType: TextInputType.number,
             controller: numberController,

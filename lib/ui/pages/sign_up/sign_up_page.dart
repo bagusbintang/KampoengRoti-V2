@@ -5,7 +5,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kampoeng_roti2/cubit/auth_cubit.dart';
 import 'package:kampoeng_roti2/shared/theme.dart';
+import 'package:kampoeng_roti2/ui/pages/sign_in/sign_in_menu/otp_page.dart';
 import 'package:kampoeng_roti2/ui/pages/sign_up/sign_up_menu/sign_up_member_page.dart';
+import 'package:kampoeng_roti2/ui/pages/sign_up/sign_up_menu/sign_up_otp_page.dart';
 import 'package:kampoeng_roti2/ui/widgets/custom_button.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -100,9 +102,12 @@ class _SignUpPageState extends State<SignUpPage> {
                 filled: true,
                 fillColor: kGreyColor,
                 hintText: 'username',
-                prefixIcon: Icon(
-                  Icons.person,
-                  color: kDarkGreyColor,
+                prefixIcon: Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: ImageIcon(
+                    AssetImage('assets/user.png'),
+                    color: kDarkGreyColor,
+                  ),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(defaultRadius),
@@ -135,9 +140,12 @@ class _SignUpPageState extends State<SignUpPage> {
                 filled: true,
                 fillColor: kGreyColor,
                 hintText: 'email',
-                prefixIcon: Icon(
-                  Icons.person,
-                  color: kDarkGreyColor,
+                prefixIcon: Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: ImageIcon(
+                    AssetImage('assets/mail.png'),
+                    color: kDarkGreyColor,
+                  ),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(defaultRadius),
@@ -171,9 +179,12 @@ class _SignUpPageState extends State<SignUpPage> {
                 filled: true,
                 fillColor: kGreyColor,
                 hintText: 'phone',
-                prefixIcon: Icon(
-                  Icons.person,
-                  color: kDarkGreyColor,
+                prefixIcon: Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: ImageIcon(
+                    AssetImage('assets/phone.png'),
+                    color: kDarkGreyColor,
+                  ),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(defaultRadius),
@@ -208,9 +219,12 @@ class _SignUpPageState extends State<SignUpPage> {
                 filled: true,
                 fillColor: kGreyColor,
                 hintText: 'password',
-                prefixIcon: Icon(
-                  Icons.lock,
-                  color: kDarkGreyColor,
+                prefixIcon: Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: ImageIcon(
+                    AssetImage('assets/padlock.png'),
+                    color: kDarkGreyColor,
+                  ),
                 ),
                 suffixIcon: IconButton(
                   focusColor: kDarkGreyColor,
@@ -250,11 +264,15 @@ class _SignUpPageState extends State<SignUpPage> {
     Widget submitButon() {
       return BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
-          if (state is AuthSuccess) {
+          if (state is AuthRegisterSuccess) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => SignUpMemberPage(user: state.user),
+                builder: (context) => SignUpOtpPage(
+                  user: state.user,
+                  email: state.user.email!,
+                  isGuestCheckOut: false,
+                ),
               ),
             );
           } else if (state is AuthFailed) {

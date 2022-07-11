@@ -105,8 +105,10 @@ class _OrderNotifPageState extends State<OrderNotifPage> {
                       style: primaryTextStyle,
                     ),
                     onPressed: () {
-                      cart.notes = noteController!.text;
-                      Navigator.pop(context);
+                      setState(() {
+                        cart.notes = noteController!.text;
+                        Navigator.pop(context);
+                      });
                     })
               ],
             ),
@@ -175,7 +177,51 @@ class _OrderNotifPageState extends State<OrderNotifPage> {
       );
     }
 
-    Widget button({required List<CartModel> cartList}) {
+    Widget button(
+        {required List<CartModel> cartList, required int totalPrice}) {
+      void _showDialog() async {
+        // cartProvider = Provider.of<CartProvider>(context);
+        await showDialog<String>(
+          context: context,
+          builder: (context) => AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            child: AlertDialog(
+              contentPadding: const EdgeInsets.all(16.0),
+              content: Row(
+                children: [
+                  Expanded(
+                    child: Theme(
+                      data: ThemeData(
+                        primaryColor: kPrimaryColor,
+                      ),
+                      child: Text(
+                        'Nominal pembelanjaan anda kurang dari ${NumberFormat.currency(
+                          locale: 'id',
+                          symbol: 'Rp ',
+                          decimalDigits: 0,
+                        ).format(UserSingleton().outlet.minOrder)}',
+                        style: chocolateTextStyle,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              actions: [
+                TextButton(
+                    child: Text(
+                      'OK',
+                      style: primaryTextStyle,
+                    ),
+                    onPressed: () {
+                      // context.read<CartCubit>().saveEditCart(carts: cartList);
+                      Navigator.pop(context);
+                    })
+              ],
+            ),
+          ),
+        );
+      }
+
       return BlocConsumer<CartCubit, CartState>(
         listener: (context, state) {
           if (state is CartSuccess) {
@@ -213,7 +259,11 @@ class _OrderNotifPageState extends State<OrderNotifPage> {
                 CustomButton(
                   title: "LANJUTKAN",
                   onpress: () {
-                    context.read<CartCubit>().saveEditCart(carts: cartList);
+                    if (totalPrice < UserSingleton().outlet.minOrder!) {
+                      _showDialog();
+                    } else {
+                      context.read<CartCubit>().saveEditCart(carts: cartList);
+                    }
                   },
                   color: kPrimaryColor,
                 ),
@@ -287,7 +337,10 @@ class _OrderNotifPageState extends State<OrderNotifPage> {
                     header(),
                     shopList(cartList: state.carts),
                     subTotal(totalPrice: total),
-                    button(cartList: state.carts),
+                    button(
+                      cartList: state.carts,
+                      totalPrice: total.toInt(),
+                    ),
                   ],
                 ),
               );

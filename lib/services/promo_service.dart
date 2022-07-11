@@ -16,14 +16,20 @@ class PromoService {
     // print(response.body);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['data']['respons_res'];
-      List<PromoModel> promos = [];
+      var status = jsonDecode(response.body)['meta']['status'];
+      if (status == 'sukses') {
+        List data = jsonDecode(response.body)['data']['respons_res'];
+        List<PromoModel> promos = [];
 
-      for (var item in data) {
-        promos.add(PromoModel.fromJson(item));
+        for (var item in data) {
+          promos.add(PromoModel.fromJson(item));
+        }
+
+        return promos;
+      } else {
+        var mssg = jsonDecode(response.body)['meta']['message'];
+        throw Exception('Gagal mendapat kan data Promo : ' + mssg);
       }
-
-      return promos;
     } else {
       throw Exception('Gagal mendapat kan data Promo: ' + response.body);
     }

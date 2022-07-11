@@ -1,12 +1,25 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kampoeng_roti2/cubit/contact_cubit.dart';
 import 'package:kampoeng_roti2/shared/theme.dart';
+import 'package:kampoeng_roti2/shared/user_singleton.dart';
 import 'package:kampoeng_roti2/ui/pages/account_page/component/account_mini_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AccountContactUsPage extends StatelessWidget {
+class AccountContactUsPage extends StatefulWidget {
   const AccountContactUsPage({Key? key}) : super(key: key);
+
+  @override
+  State<AccountContactUsPage> createState() => _AccountContactUsPageState();
+}
+
+class _AccountContactUsPageState extends State<AccountContactUsPage> {
+  @override
+  void initState() {
+    context.read<ContactCubit>().getContact();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +28,14 @@ class AccountContactUsPage extends StatelessWidget {
       required String message,
     }) async {
       String url() {
+        // if (Platform.isAndroid) {
+        //   // add the [https]
+        //   // return 'whatsapp://send?phone=$phone&${Uri.parse(message)}';
+        //   return "https://wa.me/send?$phone/?text=${Uri.parse(message)}"; // new line
+        // } else {
+        //   // add the [https]
+        //   return "https://api.whatsapp.com/send?phone=$phone=${Uri.parse(message)}"; // new line
+        // }
         if (Platform.isAndroid) {
           // add the [https]
           return "https://wa.me/$phone/?text=${Uri.parse(message)}"; // new line
@@ -111,27 +132,67 @@ class AccountContactUsPage extends StatelessWidget {
               SizedBox(
                 height: 15,
               ),
-              AccountMiniButton(
-                text: "Whatsapp",
-                onPress: () {
-                  launchWhatsApp(phone: 628983898855, message: 'Hello');
+              BlocConsumer<ContactCubit, ContactState>(
+                listener: (context, state) {
+                  if (state is ContactFailed) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: kPrimaryColor,
+                        content: Text(
+                          state.error,
+                          style: blackTextStyle,
+                        ),
+                      ),
+                    );
+                  }
                 },
-              ),
-              AccountMiniButton(
-                text: "Telp",
-                onPress: () {
-                  launch("tel:082234334552");
-                },
-              ),
-              AccountMiniButton(
-                text: "Email",
-                onPress: () {
-                  final Uri _emailLaunchUri = Uri(
-                      scheme: 'mailto',
-                      path: 'cs@kampoengroti.com',
-                      queryParameters: {'subject': 'Kendala Aplikasi'});
+                builder: (context, state) {
+                  if (state is ContactSuccess) {
+                    UserSingleton().contactUs = state.contact;
+                    return Column(
+                      children: [
+                        AccountMiniButton(
+                          text: "Whatsapp",
+                          onPress: () {
+                            launchWhatsApp(
+                                phone: int.parse(state.contact.whatsapp!),
+                                message: 'Hello.');
+                          },
+                        ),
+                        // AccountMiniButton(
+                        //   text: "Whatsapp",
+                        //   onPress: () {
+                        //     launchWhatsApp(
+                        //         phone: 6282234334552, message: 'Hello.');
+                        //   },
+                        // ),
+                        AccountMiniButton(
+                          text: "Telp",
+                          onPress: () {
+                            launch("tel:${state.contact.phone}");
+                          },
+                        ),
+                        AccountMiniButton(
+                          text: "Email",
+                          onPress: () {
+                            final Uri _emailLaunchUri = Uri(
+                                scheme: 'mailto',
+                                path: state.contact.email,
+                                queryParameters: {
+                                  'subject': 'Kendala Aplikasi'
+                                });
 
-                  launch(_emailLaunchUri.toString());
+                            launch(_emailLaunchUri.toString());
+                          },
+                        ),
+                      ],
+                    );
+                  }
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: kChocolateColor,
+                    ),
+                  );
                 },
               ),
             ],

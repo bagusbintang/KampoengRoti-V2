@@ -37,6 +37,8 @@ class CustomNewProductCard extends StatelessWidget {
             Stack(
               children: [
                 SizedBox(
+                  height: 150,
+                  width: double.infinity,
                   child: ClipRRect(
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(10.0)),
@@ -54,7 +56,7 @@ class CustomNewProductCard extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Image.asset(
-                      "assets/images/vec_love.png",
+                      "assets/vec_love.png",
                       height: 25,
                       width: 25,
                     ),
