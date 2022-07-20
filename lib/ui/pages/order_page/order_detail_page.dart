@@ -661,24 +661,28 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               //     deliv = delivPayment;
               //   }
               // }
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Biaya Pengiriman",
-                    style:
-                        blackTextStyle.copyWith(fontSize: 12, fontWeight: bold),
-                  ),
-                  Text(
-                    NumberFormat.currency(
-                      locale: 'id',
-                      symbol: 'Rp ',
-                      decimalDigits: 0,
-                    ).format(delivPayment),
-                    style:
-                        blackTextStyle.copyWith(fontSize: 12, fontWeight: bold),
-                  ),
-                ],
+
+              return Visibility(
+                visible: isPickUpChoosen,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Biaya Pengiriman",
+                      style: blackTextStyle.copyWith(
+                          fontSize: 12, fontWeight: bold),
+                    ),
+                    Text(
+                      NumberFormat.currency(
+                        locale: 'id',
+                        symbol: 'Rp ',
+                        decimalDigits: 0,
+                      ).format(delivPayment),
+                      style: blackTextStyle.copyWith(
+                          fontSize: 12, fontWeight: bold),
+                    ),
+                  ],
+                ),
               );
             }
 
