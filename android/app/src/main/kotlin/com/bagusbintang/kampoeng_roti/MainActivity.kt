@@ -1,4 +1,4 @@
-package com.primadonabakery.kampoeng_roti
+package com.bagusbintang.kampoeng_roti
 
 import io.flutter.embedding.android.FlutterActivity
 

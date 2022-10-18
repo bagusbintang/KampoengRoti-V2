@@ -31,7 +31,7 @@ class MemberUnregisterPage extends StatelessWidget {
                   // color: Colors.white,
                 ),
                 Text(
-                  "POTONGAN DISKON 10%",
+                  "POTONGAN DISKON 5%",
                   textAlign: TextAlign.center,
                   style: whiteTextStyle.copyWith(),
                 ),

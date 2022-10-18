@@ -84,7 +84,7 @@ class _ItemOrderContainerState extends State<ItemOrderContainer> {
                               symbol: 'Rp ',
                               decimalDigits: 0,
                             ).format(widget.cart.prodPrice) +
-                            " / biji",
+                            " / pcs",
                         // "Rp ${currencyFormatter.format(widget.cart.prodPrice)} / biji",
                         style: primaryTextStyle.copyWith(
                             fontSize: 10, fontWeight: semiBold),

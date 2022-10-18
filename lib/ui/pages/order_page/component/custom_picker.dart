@@ -29,11 +29,27 @@ class CustomPicker extends CommonPickerModel {
     bool isDeliv = UserSingleton().isDeliveryOption;
     int startTime = isDeliv ? delivStartTime! : pickUpStartTime!;
     int endTime = isDeliv ? delivEndTime! : pickUpEndTime!;
-    if (index >= startTime && index <= endTime) {
-      return this.digits(index, 2);
-    } else {
-      return null;
+    int jamDefault = currentTime.hour + 2;
+    if (jamDefault >= startTime) {
+      startTime = jamDefault;
     }
+    if (index < 0) {
+      if (index >= startTime && index <= endTime) {
+        return this.digits(index, 2);
+      }
+    } else {
+      if (index >= startTime && index <= endTime) {
+        return this.digits(index, 2);
+      } else {
+        return null;
+      }
+    }
+
+    // if (index >= 0 && index < 24) {
+    //   return this.digits(index, 2);
+    // } else {
+    //   return null;
+    // }
   }
 
   @override

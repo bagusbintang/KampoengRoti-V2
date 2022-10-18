@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:kampoeng_roti2/cubit/page_cubit.dart';
 import 'package:kampoeng_roti2/shared/theme.dart';
@@ -6,15 +8,79 @@ import 'package:kampoeng_roti2/ui/pages/account_page/account_menu/account_contac
 import 'package:kampoeng_roti2/ui/widgets/custom_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class OrderDonePage extends StatelessWidget {
+class OrderDonePage extends StatefulWidget {
   const OrderDonePage({Key? key}) : super(key: key);
 
   @override
+  State<OrderDonePage> createState() => _OrderDonePageState();
+}
+
+class _OrderDonePageState extends State<OrderDonePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // final routeArgs1 = ModalRoute.of(context)!.settings.arguments as String;
+
+      dynamic data = ModalRoute.of(context)!.settings.arguments;
+      dynamic grandtotal = data[2];
+      if (double.parse(grandtotal.toString()) > 250000) {
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     backgroundColor: kPrimaryColor,
+        //     content: Text(
+        //       "Mohon maaf untuk pemesanan sudah melebihi batas maksimal, customer service kami akan segera menghubungi anda",
+        //       textAlign: TextAlign.justify,
+        //       style: blackTextStyle,
+        //     ),
+        //   ),
+        // );
+        _showDialog();
+      }
+    });
+  }
+
+  void _showDialog() async {
+    await showDialog<String>(
+      context: context,
+      builder: (context) => AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        child: AlertDialog(
+          contentPadding: const EdgeInsets.all(16.0),
+          content: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  "Mohon maaf untuk pemesanan sudah melebihi batas maksimal, customer service kami akan segera menghubungi anda",
+                  textAlign: TextAlign.left,
+                  style: chocolateTextStyle.copyWith(fontWeight: semiBold),
+                ),
+              )
+            ],
+          ),
+          actions: [
+            TextButton(
+                child: Text(
+                  'Mengerti',
+                  style: primaryTextStyle,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final key = new GlobalKey<ScaffoldState>();
     Size size = MediaQuery.of(context).size;
     dynamic data = ModalRoute.of(context)!.settings.arguments;
     bool isDeliv = data[1];
     DateTime date = data[0];
+    dynamic grandtotal = data[2];
     var formatDate = DateFormat('d MMMM yyyy');
 
     Widget header() {
@@ -136,6 +202,36 @@ class OrderDonePage extends StatelessWidget {
               style: blackTextStyle.copyWith(fontWeight: semiBold),
             ),
             SizedBox(
+              height: 10,
+            ),
+            RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                text: 'Order diatas 200rb wajib transfer DP 50% \n' +
+                    'Rek BCA a/n Hendra Goenawan ',
+                style: blackTextStyle.copyWith(fontWeight: semiBold),
+                children: [
+                  TextSpan(
+                    text: '319 514 1988',
+                    style: chocolateTextStyle.copyWith(
+                      fontWeight: bold,
+                      decoration: TextDecoration.underline,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        Clipboard.setData(
+                            const ClipboardData(text: '319 514 1988'));
+                        // key.currentState
+                        //     .showSnackBar(new SnackBar(
+                        //   content:
+                        //       new Text("Copied to Clipboard"),
+                        // ));
+                      },
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
               height: 30,
             ),
             CustomButton(
@@ -197,6 +293,23 @@ class OrderDonePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class CustomToolTip extends StatelessWidget {
+  String text;
+
+  CustomToolTip({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return new GestureDetector(
+      child: new Tooltip(
+          preferBelow: false, message: "Copy", child: new Text(text)),
+      onTap: () {
+        Clipboard.setData(new ClipboardData(text: text));
+      },
     );
   }
 }

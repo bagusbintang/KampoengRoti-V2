@@ -146,8 +146,20 @@ class _OutletHeaderPageState extends State<OutletHeaderPage> {
                       size: size,
                       outletModel: outlet,
                       onPress: () {
-                        UserSingleton().outlet = outlet;
-                        Navigator.pushReplacementNamed(context, '/main');
+                        if (outlet.distance! > 7) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: kPrimaryColor,
+                              content: Text(
+                                "Tidak bisa memilih outlet karena melebihi 7 km",
+                                style: blackTextStyle,
+                              ),
+                            ),
+                          );
+                        } else {
+                          UserSingleton().outlet = outlet;
+                          Navigator.pushReplacementNamed(context, '/main');
+                        }
                       },
                     );
                   }).toList(),

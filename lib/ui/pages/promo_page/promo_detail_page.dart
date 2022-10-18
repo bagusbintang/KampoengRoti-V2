@@ -240,17 +240,12 @@ class PromoDetailPage extends StatelessWidget {
             onpress: () {
               if (used) {
                 PromoSingleton().promo.id = null;
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => OrderDetailPage()),
-                );
+                Navigator.pop(context);
               } else {
                 PromoSingleton().promo = promo;
                 if (PromoSingleton().fromPaymentPage) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => OrderDetailPage()),
-                  );
+                  Navigator.pop(context);
+                  // Navigator.pop(context);
                 } else {
                   Navigator.pop(context);
                 }

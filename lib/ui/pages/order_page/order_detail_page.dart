@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
@@ -44,15 +46,18 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Payment? selectedPayment;
   List<Payment> paymentList = [
     Payment("COD"),
+    Payment("Bank Transfer"),
   ];
-
+  DateTime dateNow = DateTime.now();
   DateTime selectDate = DateTime.now();
+  // DateTime selectTime = DateTime.now();
+  DateTime confirmDate = DateTime.now();
   var formatDate = DateFormat('d MMMM yyyy');
 
   void checkPromo({required double totalPrice}) {
     if (PromoSingleton().promo.id != null) {
       // promo = value;
-      if (totalPrice > PromoSingleton().promo.minTrans!) {
+      if (totalPrice >= PromoSingleton().promo.minTrans!) {
         // print(promo.promoType);
         if (PromoSingleton().promo.promoType == 1) {
           if (PromoSingleton().promo.discount! > 100) {
@@ -66,15 +71,24 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             // totalDisc += promoDisc;
           }
         } else if (PromoSingleton().promo.promoType == 2) {
-          if (PromoSingleton().promo.discount! > 100) {
-            promoDisc = PromoSingleton().promo.discount!;
-            // totalDisc += promoDisc;
-          } else {
-            promoDisc = (PromoSingleton().promo.discount! / 100) * delivPayment;
-            if (promoDisc > PromoSingleton().promo.maxDisc!) {
-              promoDisc = PromoSingleton().promo.maxDisc!;
+          if (isDeliveryChoosen) {
+            if (PromoSingleton().promo.discount! > 100) {
+              if (PromoSingleton().promo.discount! > delivPayment) {
+                promoDisc = delivPayment;
+              } else {
+                promoDisc = PromoSingleton().promo.discount!;
+              }
+              // totalDisc += promoDisc;
+            } else {
+              promoDisc =
+                  (PromoSingleton().promo.discount! / 100) * delivPayment;
+              if (promoDisc > PromoSingleton().promo.maxDisc!) {
+                promoDisc = PromoSingleton().promo.maxDisc!;
+              }
+              // totalDisc += promoDisc;
             }
-            // totalDisc += promoDisc;
+          } else {
+            promoDisc = 0;
           }
         }
       } else {
@@ -89,8 +103,43 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    int hourTime =
+        isDeliveryChoosen ? DateTime.now().hour + 2 : DateTime.now().hour;
+    dateNow = DateTime(DateTime.now().year, DateTime.now().month,
+        DateTime.now().day, hourTime, DateTime.now().minute);
+    selectDate = dateNow;
+
+    int? delivStartTime = UserSingleton().outlet.delivStart;
+    int? delivEndTime = UserSingleton().outlet.delivEnd;
+    int? pickUpStartTime = UserSingleton().outlet.pickUpStart;
+    int? pickUpEndTime = UserSingleton().outlet.pickUpEnd;
+    bool isDeliv = isDeliveryChoosen;
+    int startTime = isDeliv ? delivStartTime! : pickUpStartTime!;
+    int endTime = isDeliv ? delivEndTime! : pickUpEndTime!;
+    double confirmTime = (hourTime).toDouble() + (DateTime.now().minute / 100);
+    if (confirmTime > endTime) {
+      confirmDate = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day + 1,
+        startTime,
+      );
+
+      Future.delayed(
+          Duration.zero,
+          () => _showDialog(
+                DateTime.now(),
+                confirmDate,
+                "Mohon maaf untuk jam yang anda tuju melebihi jam tutup outlet ( $endTime.00 ), maka dari itu kirim di hari berikutnya",
+              ));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    UserSingleton().isDeliveryOption = isDeliveryChoosen;
+    // UserSingleton().isDeliveryOption = isDeliveryChoosen;
 
     Widget header() {
       return Container(
@@ -147,27 +196,50 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       );
     }
 
-    Widget subTotal({double? totalPrice}) {
+    Widget subTotal({double? totalPrice, int? totalQty}) {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+        child: Column(
           children: [
-            Text(
-              "Sub-Total",
-              style: blackTextStyle.copyWith(fontSize: 12, fontWeight: bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  "Total item",
+                  style:
+                      blackTextStyle.copyWith(fontSize: 12, fontWeight: bold),
+                ),
+                SizedBox(
+                  width: 20,
+                ),
+                Text(
+                  "$totalQty pcs",
+                  style: primaryTextStyle.copyWith(
+                      fontSize: 16, fontWeight: medium),
+                ),
+              ],
             ),
-            SizedBox(
-              width: 20,
-            ),
-            Text(
-              NumberFormat.currency(
-                locale: 'id',
-                symbol: 'Rp ',
-                decimalDigits: 0,
-              ).format(totalPrice ?? 0),
-              style:
-                  primaryTextStyle.copyWith(fontSize: 16, fontWeight: medium),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  "Sub-Total",
+                  style:
+                      blackTextStyle.copyWith(fontSize: 12, fontWeight: bold),
+                ),
+                SizedBox(
+                  width: 20,
+                ),
+                Text(
+                  NumberFormat.currency(
+                    locale: 'id',
+                    symbol: 'Rp ',
+                    decimalDigits: 0,
+                  ).format(totalPrice ?? 0),
+                  style: primaryTextStyle.copyWith(
+                      fontSize: 16, fontWeight: medium),
+                ),
+              ],
             ),
           ],
         ),
@@ -185,6 +257,41 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 text: 'Delivery',
                 onPress: () {
                   setState(() {
+                    selectDate = DateTime(
+                        DateTime.now().year,
+                        DateTime.now().month,
+                        DateTime.now().day,
+                        DateTime.now().hour + 2,
+                        DateTime.now().minute);
+                    int? delivStartTime = UserSingleton().outlet.delivStart;
+                    int? delivEndTime = UserSingleton().outlet.delivEnd;
+                    double confirmTime = (selectDate.hour).toDouble() +
+                        (selectDate.minute / 100);
+                    if (confirmTime > delivEndTime!) {
+                      confirmDate = DateTime(
+                        selectDate.year,
+                        selectDate.month,
+                        selectDate.day + 1,
+                        delivStartTime!,
+                      );
+                      _showDialog(
+                        selectDate,
+                        confirmDate,
+                        "Mohon maaf untuk jam yang anda tuju melebihi jam tutup outlet ( $delivEndTime.00 ), maka dari itu kirim di hari berikutnya",
+                      );
+                    } else if (confirmTime < delivStartTime!) {
+                      confirmDate = DateTime(
+                        selectDate.year,
+                        selectDate.month,
+                        selectDate.day,
+                        delivStartTime,
+                      );
+                      _showDialog(
+                        selectDate,
+                        confirmDate,
+                        "Mohon maaf kami belum buka, karena itu maka order akan kami alihkan ke jam order yang sesuai buka outlet ( ${delivStartTime}.00 )",
+                      );
+                    }
                     isDeliveryChoosen = true;
                     isPickUpChoosen = false;
                     UserSingleton().isDeliveryOption = true;
@@ -203,6 +310,41 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 text: 'Pick Up',
                 onPress: () {
                   setState(() {
+                    selectDate = DateTime(
+                        DateTime.now().year,
+                        DateTime.now().month,
+                        DateTime.now().day,
+                        DateTime.now().hour,
+                        DateTime.now().minute);
+                    int? pickUpStartTime = UserSingleton().outlet.pickUpStart;
+                    int? pickUpEndTime = UserSingleton().outlet.pickUpEnd;
+                    double confirmTime = (selectDate.hour).toDouble() +
+                        (selectDate.minute / 100);
+                    if (confirmTime > pickUpEndTime!) {
+                      confirmDate = DateTime(
+                        selectDate.year,
+                        selectDate.month,
+                        selectDate.day + 1,
+                        pickUpStartTime!,
+                      );
+                      _showDialog(
+                        selectDate,
+                        confirmDate,
+                        "Mohon maaf untuk jam yang anda tuju melebihi jam tutup outlet ( $pickUpEndTime.00 ), maka dari itu kirim di hari berikutnya",
+                      );
+                    } else if (confirmTime < pickUpStartTime!) {
+                      confirmDate = DateTime(
+                        selectDate.year,
+                        selectDate.month,
+                        selectDate.day,
+                        pickUpStartTime,
+                      );
+                      _showDialog(
+                        selectDate,
+                        confirmDate,
+                        "Mohon maaf kami belum buka, karena itu maka order akan kami alihkan ke jam order yang sesuai buka outlet ( ${pickUpEndTime}.00 )",
+                      );
+                    }
                     isDeliveryChoosen = false;
                     isPickUpChoosen = true;
 
@@ -328,25 +470,30 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       Localizations.localeOf(context).toString(),
                     ).format(selectDate),
                     onPress: () {
-                      DatePicker.showDatePicker(context,
-                          showTitleActions: true,
-                          minTime: selectDate,
-                          maxTime: DateTime(selectDate.year, 12, 31),
-                          theme: DatePickerTheme(
-                            headerColor: kPrimaryColor,
-                            backgroundColor: kWhiteColor,
-                            itemStyle: blackTextStyle.copyWith(
-                                fontSize: 18, fontWeight: bold),
-                            doneStyle: blackTextStyle.copyWith(fontSize: 16),
-                          ), onChanged: (date) {
-                        print('change $date in time zone ' +
-                            date.timeZoneOffset.inHours.toString());
-                      }, onConfirm: (date) {
-                        print('confirm $date');
-                        setState(() {
-                          selectDate = date;
-                        });
-                      }, currentTime: selectDate, locale: LocaleType.id);
+                      // DatePicker.showDatePicker(context,
+                      //     showTitleActions: true,
+                      //     minTime: dateNow,
+                      //     maxTime: DateTime(selectDate.year, 12, 31),
+                      //     theme: DatePickerTheme(
+                      //       headerColor: kPrimaryColor,
+                      //       backgroundColor: kWhiteColor,
+                      //       itemStyle: blackTextStyle.copyWith(
+                      //           fontSize: 18, fontWeight: bold),
+                      //       doneStyle: blackTextStyle.copyWith(fontSize: 16),
+                      //     ), onChanged: (date) {
+                      //   print(
+                      //       'change ${DateTime(date.year, date.month, date.day, selectDate.hour, selectDate.minute)} in time zone ' +
+                      //           date.timeZoneOffset.inHours.toString());
+                      // }, onConfirm: (date) {
+                      //   print('confirm $date');
+                      //   setState(() {
+                      //     DateTime getDate = DateTime(date.year, date.month,
+                      //         date.day, selectDate.hour, selectDate.minute);
+                      //     selectDate = getDate;
+                      //     confirmDate = getDate;
+                      //   });
+                      // }, currentTime: selectDate, locale: LocaleType.id);
+                      setTimePicker();
                     },
                   ),
                 ),
@@ -356,31 +503,51 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     title: 'Jam ${options}',
                     body: DateFormat.Hm().format(selectDate),
                     onPress: () {
-                      DatePicker.showPicker(
-                        context,
-                        showTitleActions: true,
-                        theme: DatePickerTheme(
-                          headerColor: kPrimaryColor,
-                          backgroundColor: kWhiteColor,
-                          itemStyle: blackTextStyle.copyWith(
-                              fontSize: 18, fontWeight: bold),
-                          doneStyle: blackTextStyle.copyWith(fontSize: 16),
-                        ),
-                        pickerModel: CustomPicker(
-                          currentTime: selectDate,
-                          locale: LocaleType.id,
-                        ),
-                        onChanged: (date) {
-                          print('change $date in time zone ' +
-                              date.timeZoneOffset.inHours.toString());
-                        },
-                        onConfirm: (date) {
-                          print('confirm $date');
-                          setState(() {
-                            selectDate = date;
-                          });
-                        },
-                      );
+                      // DatePicker.showPicker(
+                      //   context,
+                      //   showTitleActions: true,
+                      //   theme: DatePickerTheme(
+                      //     headerColor: kPrimaryColor,
+                      //     backgroundColor: kWhiteColor,
+                      //     itemStyle: blackTextStyle.copyWith(
+                      //         fontSize: 18, fontWeight: bold),
+                      //     doneStyle: blackTextStyle.copyWith(fontSize: 16),
+                      //   ),
+                      //   pickerModel: CustomPicker(
+                      //     currentTime: selectDate,
+                      //     locale: LocaleType.id,
+                      //   ),
+                      //   onChanged: (date) {
+                      //     print('change $date in time zone ' +
+                      //         date.timeZoneOffset.inHours.toString());
+                      //   },
+                      //   onConfirm: (date) {
+                      //     print('confirm $date');
+                      //     int? delivStartTime =
+                      //         UserSingleton().outlet.delivStart;
+                      //     int? delivEndTime = UserSingleton().outlet.delivEnd;
+                      //     int? pickUpStartTime =
+                      //         UserSingleton().outlet.pickUpStart;
+                      //     int? pickUpEndTime = UserSingleton().outlet.pickUpEnd;
+                      //     bool isDeliv = UserSingleton().isDeliveryOption;
+                      //     int startTime =
+                      //         isDeliv ? delivStartTime! : pickUpStartTime!;
+                      //     double endTime =
+                      //         (isDeliv ? delivEndTime! : pickUpEndTime!) -
+                      //             1.toDouble();
+                      //     double confirmTime =
+                      //         date.hour.toDouble() + date.minute.toDouble();
+                      //     if (confirmTime > endTime) {
+                      //       _showDialog(date, endTime.toInt());
+                      //     } else {
+                      //       setState(() {
+                      //         selectTime = date;
+                      //         confirmDate = date;
+                      //       });
+                      //     }
+                      //   },
+                      // );
+                      setTimePicker();
                     },
                   ),
                 ),
@@ -408,9 +575,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         Widget deliveryPrice() {
           // double deliv = 0;
 
-          if (UserSingleton().outlet.distance!.round() > 5) {
-            int range = UserSingleton().outlet.distance!.round() - 5;
-            delivPayment = 2000 * range + 5000;
+          if (UserSingleton().outlet.distance!.round() > 3) {
+            int range = UserSingleton().outlet.distance!.round() - 3;
+            delivPayment = 3000 * range + 5000;
           } else {
             delivPayment = 5000;
           }
@@ -419,27 +586,30 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           //     deliv = delivPayment;
           //   }
           // }
-          return Container(
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-            color: Colors.white,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  "Biaya Pengiriman",
-                  style: blackTextStyle.copyWith(
-                      fontSize: 12, fontWeight: semiBold),
-                ),
-                Text(
-                  NumberFormat.currency(
-                    locale: 'id',
-                    symbol: 'Rp ',
-                    decimalDigits: 0,
-                  ).format(delivPayment),
-                  style: primaryTextStyle.copyWith(
-                      fontSize: 12, fontWeight: medium),
-                ),
-              ],
+          return Visibility(
+            visible: isDeliveryChoosen,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    "Biaya Pengiriman",
+                    style: blackTextStyle.copyWith(
+                        fontSize: 12, fontWeight: semiBold),
+                  ),
+                  Text(
+                    NumberFormat.currency(
+                      locale: 'id',
+                      symbol: 'Rp ',
+                      decimalDigits: 0,
+                    ).format(delivPayment),
+                    style: primaryTextStyle.copyWith(
+                        fontSize: 12, fontWeight: medium),
+                  ),
+                ],
+              ),
             ),
           );
         }
@@ -521,12 +691,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                             ),
                           ).then(
-                            (value) => setState(
+                            (_) => setState(
                               () {
+                                promoDisc = 0;
                                 // totalDisc = 0;
                                 // promo = value;
                                 if (PromoSingleton().promo == null) {
-                                  promoDisc = 0;
                                   isValueNotGetMinDisc = false;
                                   // checkMemberDisc();
                                   // totalDisc += promoDisc;
@@ -586,6 +756,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             }
 
             Widget discPromo() {
+              String descDisc = "";
+              if (PromoSingleton().promo.promoType == 1) {
+                descDisc = "Belanja";
+              } else if (PromoSingleton().promo.promoType == 2) {
+                descDisc = "Biaya Kirim";
+              }
               return Visibility(
                 visible: promoDisc > 0 ? true : false,
                 // visible: true,
@@ -593,16 +769,17 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      "Disc Promo",
+                      "Diskon $descDisc",
                       style:
                           redTextStyle.copyWith(fontSize: 12, fontWeight: bold),
                     ),
                     Text(
-                      NumberFormat.currency(
-                        locale: 'id',
-                        symbol: 'Rp ',
-                        decimalDigits: 0,
-                      ).format(promoDisc),
+                      "-" +
+                          NumberFormat.currency(
+                            locale: 'id',
+                            symbol: 'Rp ',
+                            decimalDigits: 0,
+                          ).format(promoDisc),
                       style:
                           redTextStyle.copyWith(fontSize: 12, fontWeight: bold),
                     ),
@@ -634,11 +811,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           redTextStyle.copyWith(fontSize: 12, fontWeight: bold),
                     ),
                     Text(
-                      NumberFormat.currency(
-                        locale: 'id',
-                        symbol: 'Rp ',
-                        decimalDigits: 0,
-                      ).format(memberDisc),
+                      "-" +
+                          NumberFormat.currency(
+                            locale: 'id',
+                            symbol: 'Rp ',
+                            decimalDigits: 0,
+                          ).format(memberDisc),
                       style:
                           redTextStyle.copyWith(fontSize: 12, fontWeight: bold),
                     ),
@@ -650,9 +828,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             Widget deliveryPayment() {
               // double deliv = 0;
               double delivPayment = 0;
-              if (UserSingleton().outlet.distance!.round() > 5) {
-                int range = UserSingleton().outlet.distance!.round() - 5;
-                delivPayment = 2000 * range + 5000;
+              if (UserSingleton().outlet.distance!.round() > 3) {
+                int range = UserSingleton().outlet.distance!.round() - 3;
+                delivPayment = 3000 * range + 5000;
               } else {
                 delivPayment = 5000;
               }
@@ -663,7 +841,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               // }
 
               return Visibility(
-                visible: isPickUpChoosen,
+                visible: isDeliveryChoosen,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -690,10 +868,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               // double delivPayment = 0;
               // double grandTotal = 0;
               // double discMember = 0;
+
               if (UserSingleton().outlet != null) {
-                if (UserSingleton().outlet.distance!.round() > 5) {
-                  int range = UserSingleton().outlet.distance!.round() - 5;
-                  delivPayment = 2000 * range + 5000;
+                if (UserSingleton().outlet.distance!.round() > 3) {
+                  int range = UserSingleton().outlet.distance!.round() - 3;
+                  delivPayment = 3000 * range + 5000;
                 } else {
                   delivPayment = 5000;
                 }
@@ -742,9 +921,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               child: Column(
                 children: [
                   totalPriceOrder(),
+                  deliveryPayment(),
                   discPromo(),
                   discMember(),
-                  deliveryPayment(),
                   Divider(
                     height: 20,
                     thickness: 1,
@@ -888,8 +1067,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               context,
               MaterialPageRoute(
                 builder: (context) => OrderDonePage(),
-                settings:
-                    RouteSettings(arguments: [selectDate, isDeliveryChoosen]),
+                settings: RouteSettings(arguments: [
+                  selectDate,
+                  isDeliveryChoosen,
+                  grandTotalDouble
+                ]),
               ),
             );
 
@@ -925,34 +1107,63 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 CustomButton(
                   title: "SETUJU & ORDER",
                   onpress: () {
-                    if (selectedPayment != null) {
-                      context.read<OrderCubit>().order(
-                            userId: UserSingleton().user.id!,
-                            deliveryMethod: isDeliveryChoosen ? 1 : 2,
-                            addressId: isDeliveryChoosen
-                                ? UserSingleton().address.id!
-                                : null,
-                            outletId: UserSingleton().outlet.id!,
-                            promoId: PromoSingleton().promo.id ?? 0,
-                            shippingCosts: isDeliveryChoosen ? delivPayment : 0,
-                            promoDisc: promoDisc,
-                            memberDisc: memberDisc,
-                            deliveryTime: selectDate.toString(),
-                            paymenMethod: selectedPayment!.payment,
-                            note: "",
-                            total: totalPrice!,
-                            grandTotal: grandTotalDouble,
-                          );
-                    } else {
+                    String option = isDeliveryChoosen ? "Deliver" : "PickUp";
+                    double open = 6;
+                    double close = isDeliveryChoosen ? 20.00 : 21.00;
+                    double current = (DateTime.now().hour).toDouble() +
+                        (DateTime.now().minute / 100);
+                    ;
+                    if (current >= close) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           backgroundColor: kPrimaryColor,
                           content: Text(
-                            'Silahkan pilih pembayaran terlebih dahulu',
+                            "Outlet sudah tutup. Jam $option outlet 06.00 - ${close.toInt()}.00.",
                             style: blackTextStyle,
                           ),
                         ),
                       );
+                    } else if (current < open) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: kPrimaryColor,
+                          content: Text(
+                            "Outlet belum buka. Jam $option outlet 06.00 - $close.00.",
+                            style: blackTextStyle,
+                          ),
+                        ),
+                      );
+                    } else {
+                      if (selectedPayment != null) {
+                        context.read<OrderCubit>().order(
+                              userId: UserSingleton().user.id!,
+                              deliveryMethod: isDeliveryChoosen ? 1 : 2,
+                              addressId: isDeliveryChoosen
+                                  ? UserSingleton().address.id!
+                                  : null,
+                              outletId: UserSingleton().outlet.id!,
+                              promoId: PromoSingleton().promo.id ?? 0,
+                              shippingCosts:
+                                  isDeliveryChoosen ? delivPayment : 0,
+                              promoDisc: promoDisc,
+                              memberDisc: memberDisc,
+                              deliveryTime: selectDate.toString(),
+                              paymenMethod: selectedPayment!.payment,
+                              note: "",
+                              total: totalPrice!,
+                              grandTotal: grandTotalDouble,
+                            );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: kPrimaryColor,
+                            content: Text(
+                              'Silahkan pilih pembayaran terlebih dahulu',
+                              style: blackTextStyle,
+                            ),
+                          ),
+                        );
+                      }
                     }
                   },
                   color: kPrimaryColor,
@@ -1011,8 +1222,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         builder: (context, state) {
           if (state is CartSuccess) {
             double total = 0;
+            int subtotalQty = 0;
             for (var item in state.carts) {
               total += (item.quantity! * item.prodPrice!.toInt());
+              subtotalQty += item.quantity!;
             }
             return WillPopScope(
               onWillPop: () async {
@@ -1028,7 +1241,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 children: [
                   header(),
                   shopList(cartList: state.carts),
-                  subTotal(totalPrice: total),
+                  subTotal(totalPrice: total, totalQty: subtotalQty),
                   choosingDelivery(totalPrice: total),
                   selectPayment(),
                   button(totalPrice: total),
@@ -1044,5 +1257,135 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         },
       ),
     );
+  }
+
+  void _showDialog(DateTime date, DateTime confirmDate, String mssg) async {
+    await showDialog<String>(
+      context: context,
+      builder: (context) => AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        child: AlertDialog(
+          contentPadding: const EdgeInsets.all(16.0),
+          content: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  mssg,
+                  textAlign: TextAlign.left,
+                  style: chocolateTextStyle,
+                ),
+              )
+            ],
+          ),
+          actions: [
+            TextButton(
+                child: Text(
+                  'Mengerti',
+                  style: primaryTextStyle,
+                ),
+                onPressed: () {
+                  // int? delivStartTime = UserSingleton().outlet.delivStart;
+                  // int? pickUpStartTime = UserSingleton().outlet.pickUpStart;
+                  // bool isDeliv = UserSingleton().isDeliveryOption;
+                  // int startTime = isDeliv ? delivStartTime! : pickUpStartTime!;
+                  setState(() {
+                    selectDate = confirmDate;
+                    Navigator.pop(context);
+                  });
+                }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void setTimePicker() {
+    int hourTime =
+        isDeliveryChoosen ? DateTime.now().hour + 2 : DateTime.now().hour;
+    dateNow = DateTime(DateTime.now().year, DateTime.now().month,
+        DateTime.now().day, hourTime, DateTime.now().minute);
+    DatePicker.showDateTimePicker(context,
+        showTitleActions: true,
+        minTime: dateNow,
+        maxTime: DateTime(dateNow.year, 12, 31),
+        // currentTime: dateNow,
+        theme: DatePickerTheme(
+          headerColor: kPrimaryColor,
+          backgroundColor: kWhiteColor,
+          itemStyle: blackTextStyle.copyWith(fontSize: 18, fontWeight: bold),
+          doneStyle: blackTextStyle.copyWith(fontSize: 16),
+        ), onChanged: (date) {
+      print('change $date in time zone ' +
+          date.timeZoneOffset.inHours.toString());
+    }, onConfirm: (date) {
+      print('confirm $date');
+
+      int? delivStartTime = UserSingleton().outlet.delivStart;
+      int? delivEndTime = UserSingleton().outlet.delivEnd;
+      int? pickUpStartTime = UserSingleton().outlet.pickUpStart;
+      int? pickUpEndTime = UserSingleton().outlet.pickUpEnd;
+      bool isDeliv = isDeliveryChoosen;
+      int startTime = isDeliv ? delivStartTime! : pickUpStartTime!;
+      int endTime = isDeliv ? delivEndTime! : pickUpEndTime!;
+      double confirmTime = (date.hour).toDouble() + (date.minute / 100);
+      if (confirmTime > endTime) {
+        confirmDate = DateTime(
+          date.year,
+          date.month,
+          date.day + 1,
+          startTime,
+        );
+        _showDialog(
+          date,
+          confirmDate,
+          "Mohon maaf untuk jam yang anda tuju melebihi jam tutup outlet ( $endTime.00 ), maka dari itu kirim di hari berikutnya",
+        );
+      } else if (confirmTime < startTime) {
+        confirmDate = DateTime(
+          date.year,
+          date.month,
+          date.day,
+          startTime,
+        );
+        _showDialog(
+          date,
+          confirmDate,
+          "Mohon maaf kami belum buka, karena itu maka order akan kami alihkan ke jam order yang sesuai buka outlet ( ${startTime}.00 )",
+        );
+      }
+      // else if (confirmTime > (endTime - 1).toDouble()) {
+      //   confirmDate = DateTime(
+      //     date.year,
+      //     date.month,
+      //     date.day + 1,
+      //     startTime + 2,
+      //   );
+      //   _showDialog(
+      //     date,
+      //     confirmDate,
+      //     "Mohon maaf untuk pemesanan anda akan kami kirim di hari berikutnya, dikarenakan sudah melebihi jam maksimal order kami ( ${endTime - 1}.00 )",
+      //   );
+      // }
+      else {
+        setState(() {
+          // selectTime = date;
+          // confirmDate = date;
+          selectDate = date;
+          confirmDate = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            date.hour,
+            date.minute,
+            date.second,
+          );
+          // _showDialog(
+          //   date,
+          //   confirmDate,
+          //   "ini untuk menampilkan jam order + 2 jam, jam order ( ${date.hour + 2}.00 )",
+          // );
+        });
+      }
+    }, locale: LocaleType.id);
   }
 }

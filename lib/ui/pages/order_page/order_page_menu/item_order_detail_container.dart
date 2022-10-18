@@ -67,9 +67,18 @@ class ItemOrderDetailContainer extends StatelessWidget {
                               symbol: 'Rp ',
                               decimalDigits: 0,
                             ).format(cart.prodPrice) +
-                            " / biji",
+                            " / pcs",
                         // "Rp ${currencyFormatter.format(widget.cart.prodPrice)} / biji",
                         style: primaryTextStyle.copyWith(
+                            fontSize: 10, fontWeight: semiBold),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        cart.quantity.toString() + " pcs",
+                        // "Rp ${currencyFormatter.format(widget.cart.prodPrice)} / biji",
+                        style: blackTextStyle.copyWith(
                             fontSize: 10, fontWeight: semiBold),
                       ),
                       SizedBox(
