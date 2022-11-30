@@ -42,6 +42,6 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This permission is not needed by the app, but it is required by an underlying API. If you see this dialog, contact us.</string>
+	<string>We already had many outlets since 2012. We need to track the customer's position to select the nearest outlet for them.</string>
 </dict>
 </plist>
