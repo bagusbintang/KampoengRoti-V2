@@ -38,11 +38,13 @@ class CartService {
   Future<CartModel> addCart({
     required int userId,
     required int prodId,
+    required int outletId,
     int quantity = 1,
   }) async {
     Uri url = Uri.parse("$addCartUrl/${userId}/${prodId}");
     var body = jsonEncode({
       'qty': quantity,
+      'outlet_id' : outletId,
     });
     var response = await http.post(
       url,

@@ -25,6 +25,7 @@ class CartCubit extends Cubit<CartState> {
   void addCart({
     required int userId,
     required int productId,
+    required int outletId,
     int quantity = 1,
   }) async {
     try {
@@ -32,6 +33,7 @@ class CartCubit extends Cubit<CartState> {
       await CartService().addCart(
         userId: userId,
         prodId: productId,
+        outletId: outletId,
         quantity: quantity,
       );
       List<CartModel> carts = await CartService().getCart(userId: userId);

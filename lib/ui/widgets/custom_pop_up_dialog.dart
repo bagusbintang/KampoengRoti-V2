@@ -188,6 +188,7 @@ class CustomPopUpDialog extends StatelessWidget {
                 onpress: () {
                   context.read<CartCubit>().addCart(
                       userId: UserSingleton().user.id!,
+                      outletId: UserSingleton().outlet.id!,
                       productId: product.id!,
                       quantity: numbOfText);
                 },

@@ -20,7 +20,7 @@ import 'ui/pages/main_page.dart';
 import 'ui/pages/sign_in/sign_in_pages.dart';
 import 'ui/pages/welcome_page.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
