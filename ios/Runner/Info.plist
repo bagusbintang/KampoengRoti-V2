@@ -41,7 +41,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSLocationWhenInUseUsageDescription</key>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We already had many outlets since 2012. We need to track the customer's position to select the nearest outlet for them.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We use photo library for membership registration</string>
 </dict>
 </plist>
