@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>kampoeng_roti2</string>
+	<string>Kampoeng Roti</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -45,5 +45,7 @@
 	<string>We already had many outlets since 2012. We need to track the customer's position to select the nearest outlet for them.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We use photo library for membership registration</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 </dict>
 </plist>

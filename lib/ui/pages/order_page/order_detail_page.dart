@@ -134,6 +134,31 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 confirmDate,
                 "Mohon maaf untuk jam yang anda tuju melebihi jam tutup outlet ( $endTime.00 ), maka dari itu kirim di hari berikutnya",
               ));
+    } else if (confirmTime < startTime) {
+      confirmDate = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+        startTime,
+      );
+      Future.delayed(
+          Duration.zero,
+          () => _showDialog(
+                DateTime.now(),
+                confirmDate,
+                "Mohon maaf kami belum buka, karena itu maka order akan kami alihkan ke jam order yang sesuai buka outlet ( ${startTime}.00 )",
+              ));
+      // confirmDate = DateTime(
+      //   date.year,
+      //   date.month,
+      //   date.day,
+      //   startTime,
+      // );
+      // _showDialog(
+      //   date,
+      //   confirmDate,
+      //   "Mohon maaf kami belum buka, karena itu maka order akan kami alihkan ke jam order yang sesuai buka outlet ( ${startTime}.00 )",
+      // );
     }
   }
 
