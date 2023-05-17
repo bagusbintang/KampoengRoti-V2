@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart' as Picker;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:kampoeng_roti2/cubit/auth_cubit.dart';
@@ -200,11 +200,11 @@ class _MemberMenuSignUpState extends State<MemberMenuSignUp> {
           child: GestureDetector(
             onTap: () {
               if (isEnable) {
-                DatePicker.showDatePicker(context,
+                Picker.DatePicker.showDatePicker(context,
                     showTitleActions: true,
                     minTime: DateTime(1970, 12, 31),
                     maxTime: DateTime(2005, 12, 31),
-                    theme: DatePickerTheme(
+                    theme: Picker.DatePickerTheme(
                         headerColor: kPrimaryColor,
                         backgroundColor: kWhiteColor,
                         itemStyle: blackTextStyle.copyWith(
@@ -222,7 +222,7 @@ class _MemberMenuSignUpState extends State<MemberMenuSignUp> {
                     selectDate = date;
                     dateController.text = formatDate.format(date);
                   });
-                }, currentTime: selectDate, locale: LocaleType.id);
+                }, currentTime: selectDate, locale: Picker.LocaleType.id);
               }
             },
             child: CustomInputTextMember(

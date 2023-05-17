@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart' as Picker;
 import 'package:intl/intl.dart';
 import 'package:kampoeng_roti2/cubit/cart_cubit.dart';
 import 'package:kampoeng_roti2/cubit/order_cubit.dart';
@@ -1329,12 +1329,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         isDeliveryChoosen ? DateTime.now().hour + 2 : DateTime.now().hour;
     dateNow = DateTime(DateTime.now().year, DateTime.now().month,
         DateTime.now().day, hourTime, DateTime.now().minute);
-    DatePicker.showDateTimePicker(context,
+    Picker.DatePicker.showDateTimePicker(context,
         showTitleActions: true,
         minTime: dateNow,
         maxTime: DateTime(dateNow.year, 12, 31),
         // currentTime: dateNow,
-        theme: DatePickerTheme(
+        theme: Picker.DatePickerTheme(
           headerColor: kPrimaryColor,
           backgroundColor: kWhiteColor,
           itemStyle: blackTextStyle.copyWith(fontSize: 18, fontWeight: bold),
@@ -1411,6 +1411,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           // );
         });
       }
-    }, locale: LocaleType.id);
+    }, locale: Picker.LocaleType.id);
   }
 }

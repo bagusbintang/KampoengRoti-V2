@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart' as Picker;
 import 'package:kampoeng_roti2/shared/user_singleton.dart';
 
-class CustomPicker extends CommonPickerModel {
+class CustomPicker extends Picker.CommonPickerModel {
   String digits(int value, int length) {
     return '$value'.padLeft(length, "0");
   }
@@ -12,7 +12,7 @@ class CustomPicker extends CommonPickerModel {
     DateTime? currentTime,
     DateTime? minTime,
     DateTime? maxTime,
-    LocaleType? locale,
+    Picker.LocaleType? locale,
   }) : super(locale: locale) {
     this.currentTime = currentTime ?? DateTime.now();
     this.setLeftIndex(this.currentTime.hour);

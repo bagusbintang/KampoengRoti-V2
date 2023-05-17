@@ -36,7 +36,7 @@ dependencies:
   flutter_google_places: ^0.3.0
   geocoding: ^2.0.4
   geolocator: ^7.7.0
-  google_fonts: ^2.1.1
+  google_fonts: ^4.0.4
   google_maps_flutter: ^2.1.2
   image_picker: ^0.8.4+11
   intl: ^0.17.0
@@ -46,6 +46,7 @@ dependencies:
   shared_preferences: ^2.0.13
   url_launcher: ^6.0.20
   change_app_package_name: ^1.1.0
+  file: ^6.1.4
 
 dev_dependencies:
   flutter_lints: ^1.0.0
