@@ -129,12 +129,24 @@ class WelcomePage extends StatelessWidget {
           body: Center(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: defaultMargin),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: ListView(
                 children: [
-                  Spacer(),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height/4,
+                  ),
                   header(),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height/9,
+                  ),
                   button(),
+                  // Column(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     Spacer(),
+                  //     header(),
+                  //     button(),
+                  //   ],
+                  // ),
                 ],
               ),
             ),
