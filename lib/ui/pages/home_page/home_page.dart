@@ -583,7 +583,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisSpacing: 10,
                     scrollDirection: Axis.vertical,
                     physics: NeverScrollableScrollPhysics(),
-                    childAspectRatio: 4 / 6,
+                    childAspectRatio: 9/6,
                     children: state.products.map((ProductModel newProducts) {
                       return CustomNewProductCard(
                         product: newProducts,
